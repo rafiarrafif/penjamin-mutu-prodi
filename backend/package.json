@@ -6,10 +6,15 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@prisma/adapter-mssql": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "dotenv": "^18.0.10",
+    "elysia": "latest",
+    "mssql": "^12.7.14"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "prisma": "7.10.1"
   },
   "module": "src/index.js"
 }

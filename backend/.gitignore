@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/src/generated/prisma/
 /.pnp
 .pnp.js
 
@@ -43,3 +44,5 @@ package-lock.json
 
 AGENTS.md
 .agents
+.env
+*.env

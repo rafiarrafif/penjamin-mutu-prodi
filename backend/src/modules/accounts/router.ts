@@ -1,4 +1,6 @@
 import { Elysia } from "elysia";
+import "dotenv/config";
+import { jwt } from "@elysia/jwt";
 import type { OpenAPIV3 } from "openapi-types";
 import { googleAuthorizationCallbackController } from "./controllers/googleAuthorizationCallback.controller";
 import { requestGoogleAuthorizationController } from "./controllers/requestGoogleAuthorization.controller";
@@ -40,9 +42,15 @@ const errorEnvelope: OpenAPIV3.SchemaObject = {
   },
 };
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET is not configured");
+}
+
 export const accountsRouter = new Elysia({ name: "accounts" })
+  .use(jwt({ name: "jwt", secret: jwtSecret, exp: "7d" }))
   .onBeforeHandle(unauthenticatedOnlyMiddleware)
-  .post("/account/auth/request/google", requestGoogleAuthorizationController, {
+  .post("/accounts/auth/request/google", requestGoogleAuthorizationController, {
     detail: {
       summary: "Request Google login URL",
       description:
@@ -83,66 +91,54 @@ export const accountsRouter = new Elysia({ name: "accounts" })
       },
     },
   })
-  .get("/account/auth/callback/google", googleAuthorizationCallbackController, {
-    detail: {
-      summary: "Complete Google login",
-      description:
-        "Validate Google's OAuth callback, require an existing provisioned account, and create a session without issuing a JWT.",
-      tags: ["Google OAuth"],
-      parameters: [
-        {
-          name: "code",
-          in: "query",
-          required: false,
-          schema: { type: "string" },
-          description: "Authorization code returned by Google.",
-        },
-        {
-          name: "state",
-          in: "query",
-          required: false,
-          schema: { type: "string" },
-          description: "OAuth state value returned by Google.",
-        },
-        {
-          name: "error",
-          in: "query",
-          required: false,
-          schema: { type: "string" },
-          description: "OAuth error returned when authorization is denied.",
-        },
-      ],
-      responses: {
-        200: {
-          description:
-            "An existing account was authenticated and a session created.",
-          content: {
-            "application/json": {
-              schema: {
-                ...successEnvelope,
-                properties: {
-                  ...successEnvelope.properties,
-                  data: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      required: ["id", "accountId", "deviceType", "loggedInAt"],
-                      properties: {
-                        id: { type: "string", format: "uuid" },
-                        accountId: { type: "string", format: "uuid" },
-                        deviceType: {
-                          type: "string",
-                          enum: ["mobile", "tablet", "tv", "desktop"],
-                        },
-                        deviceOs: { type: "string", nullable: true },
-                        browser: { type: "string", nullable: true },
-                        ipAddress: { type: "string", nullable: true },
-                        loggedInAt: { type: "string", format: "date-time" },
-                        revokedAt: {
-                          type: "string",
-                          format: "date-time",
-                          nullable: true,
-                        },
+  .get(
+    "/accounts/auth/callback/google",
+    googleAuthorizationCallbackController,
+    {
+      detail: {
+        summary: "Complete Google login",
+        description:
+          "Validate Google's OAuth callback, require an existing provisioned account, and create a session without issuing a JWT.",
+        tags: ["Google OAuth"],
+        parameters: [
+          {
+            name: "code",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Authorization code returned by Google.",
+          },
+          {
+            name: "state",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "OAuth state value returned by Google.",
+          },
+          {
+            name: "error",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "OAuth error returned when authorization is denied.",
+          },
+        ],
+        responses: {
+          200: {
+            description:
+              "An existing account was authenticated and a signed JWT was issued.",
+            content: {
+              "application/json": {
+                schema: {
+                  ...successEnvelope,
+                  properties: {
+                    ...successEnvelope.properties,
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        required: ["token"],
+                        properties: { token: { type: "string" } },
                       },
                     },
                   },
@@ -150,29 +146,30 @@ export const accountsRouter = new Elysia({ name: "accounts" })
               },
             },
           },
-        },
-        400: {
-          description:
-            "The callback query or OAuth state is invalid or expired.",
-          content: { "application/json": { schema: errorEnvelope } },
-        },
-        403: {
-          description:
-            "Google email is unverified or no account is provisioned for it.",
-          content: { "application/json": { schema: errorEnvelope } },
-        },
-        502: {
-          description: "Google returned a profile that could not be validated.",
-          content: { "application/json": { schema: errorEnvelope } },
-        },
-        500: {
-          description: "OAuth provider, Redis, or database operation failed.",
-          content: { "application/json": { schema: errorEnvelope } },
-        },
-        401: {
-          description: "This endpoint is only available to logged-out users.",
-          content: { "application/json": { schema: errorEnvelope } },
+          400: {
+            description:
+              "The callback query or OAuth state is invalid or expired.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          403: {
+            description:
+              "Google email is unverified or no account is provisioned for it.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          502: {
+            description:
+              "Google returned a profile that could not be validated.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          500: {
+            description: "OAuth provider, Redis, or database operation failed.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          401: {
+            description: "This endpoint is only available to logged-out users.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
         },
       },
     },
-  });
+  );

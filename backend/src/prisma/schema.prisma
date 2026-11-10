@@ -58,11 +58,18 @@ model FileUpload {
 }
 
 model Department {
-  id          String              @id @db.UniqueIdentifier
-  name        String              @db.VarChar(115)
-  description String?             @db.VarChar(255)
-  histories   DepartmentHistory[]
-  pics        DepartmentPic[]
+  id              String              @id @db.UniqueIdentifier
+  name            String              @db.VarChar(115)
+  description     String?             @db.VarChar(255)
+  accountIdCreator String              @map("account_id_creator") @db.UniqueIdentifier
+  accountIdUpdater String?             @map("account_id_updater") @db.UniqueIdentifier
+  createdAt       DateTime            @map("created_at") @db.DateTime2
+  updatedAt       DateTime            @map("updated_at") @db.DateTime2
+  deletedAt       DateTime?           @map("deleted_at") @db.DateTime2
+  creator         Account             @relation("DepartmentCreator", fields: [accountIdCreator], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updater         Account?            @relation("DepartmentUpdater", fields: [accountIdUpdater], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  histories       DepartmentHistory[]
+  pics            DepartmentPic[]
 
   @@map("departments")
 }
@@ -92,6 +99,8 @@ model Account {
   scoringFormulasCreated   ScoringFormula[]      @relation("ScoringFormulaCreator")
   scoringFormulasUpdated   ScoringFormula[]      @relation("ScoringFormulaUpdater")
   departmentPicAssignments DepartmentPic[]       @relation("DepartmentPicAssigner")
+  departmentsCreated      Department[]          @relation("DepartmentCreator")
+  departmentsUpdated      Department[]          @relation("DepartmentUpdater")
 
   @@map("accounts")
 }

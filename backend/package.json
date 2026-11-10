@@ -6,6 +6,7 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "@elysia/jwt": "^1.4.2",
     "@elysia/openapi": "^1.4.17",
     "@prisma/adapter-mssql": "7.10.1",
     "@prisma/client": "7.10.1",

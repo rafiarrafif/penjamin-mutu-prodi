@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Google } from "arctic";
 
-export const GOOGLE_CALLBACK_PATH = "/account/auth/callback/google";
+export const GOOGLE_CALLBACK_PATH = "/accounts/auth/callback/google";
 
 export function getGoogleProvider(): Google {
   const clientId = process.env.GOOGLE_CLIENT_ID;

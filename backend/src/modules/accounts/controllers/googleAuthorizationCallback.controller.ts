@@ -11,12 +11,17 @@ import {
 } from "../schemas/googleAuthorizationCallback.schema";
 import { getClientIpAddress } from "../../../helper/clientIp";
 
+interface JwtContext {
+  sign(payload: any): Promise<string>;
+}
+
 export async function googleAuthorizationCallbackController({
+  jwt,
   query,
   request,
   server,
   set,
-}: Context) {
+}: Context & { jwt: JwtContext }) {
   try {
     const parsedQuery = googleCallbackQuerySchema.safeParse(query);
     if (!parsedQuery.success) return handleError(parsedQuery.error, { set });
@@ -66,7 +71,7 @@ export async function googleAuthorizationCallbackController({
       );
     }
 
-    const session = await createGoogleLoginSession(
+    const login = await createGoogleLoginSession(
       parsedProfile.data.email,
       parsedProfile.data.sub,
       parsedProfile.data.picture ?? null,
@@ -74,7 +79,7 @@ export async function googleAuthorizationCallbackController({
       getClientIpAddress(request, server),
     );
 
-    if (!session) {
+    if (!login) {
       return errorResponse(
         { set },
         {
@@ -86,12 +91,22 @@ export async function googleAuthorizationCallbackController({
       );
     }
 
+    const token = await jwt.sign({
+      session_id: login.sessionId,
+      account: {
+        ...login.account,
+        createdAt: login.account.createdAt.toISOString(),
+        updatedAt: login.account.updatedAt.toISOString(),
+        deletedAt: login.account.deletedAt?.toISOString() ?? null,
+      },
+    });
+
     return successResponse(
       { set },
       {
         title: "Google authentication successful",
-        description: "A session was created for the existing account.",
-        data: [session],
+        description: "A JWT was issued for the authenticated account.",
+        data: [{ token }],
       },
     );
   } catch (error) {

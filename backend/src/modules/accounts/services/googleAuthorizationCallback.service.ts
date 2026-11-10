@@ -48,5 +48,14 @@ export async function createGoogleLoginSession(
   const account = await updateGoogleAccountByEmail(email, sub, profilePicture);
   if (!account) return null;
 
-  return createSession({ accountId: account.id, userAgent, ipAddress });
+  const session = await createSession({
+    accountId: account.id,
+    userAgent,
+    ipAddress,
+  });
+
+  return {
+    sessionId: session.id,
+    account,
+  };
 }

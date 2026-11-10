@@ -18,6 +18,5 @@ export async function updateGoogleAccountByEmail(
   return prisma.account.update({
     where: { id: account.id },
     data: { sub, profilePicture },
-    select: { id: true },
   });
 }

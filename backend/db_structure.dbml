@@ -34,6 +34,11 @@ Table "dbo"."departments" {
   "id" uniqueidentifier [pk, not null]
   "name" varchar(115) [not null]
   "description" varchar(255)
+  "account_id_creator" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "account_id_updater" uniqueidentifier [ref: > "dbo"."accounts"."id"]
+  "created_at" datetime2 [not null]
+  "updated_at" datetime2 [not null]
+  "deleted_at" datetime2
 }
 
 Table "dbo"."accounts" {

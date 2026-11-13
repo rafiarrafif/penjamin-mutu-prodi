@@ -7,6 +7,8 @@ import { requestGoogleAuthorizationController } from "./controllers/requestGoogl
 import { unauthenticatedOnlyMiddleware } from "./middlewares/unauthenticatedOnly.middleware";
 import { requireRoleMiddleware } from "../../middlewares/requireRole.middleware";
 import { createAccountController } from "./controllers/createAccount.controller";
+import { approvalProvisionController } from "./controllers/approvalProvision.controller";
+import { editFromAdminController } from "./controllers/editFromAdmin.controller";
 
 const successEnvelope: OpenAPIV3.SchemaObject = {
   type: "object",
@@ -249,4 +251,166 @@ export const accountsRouter = new Elysia({ name: "accounts" })
         },
       },
     },
-  });
+  })
+  .derive(requireRoleMiddleware("director"))
+  .post(
+    "/accounts/approvalProvision",
+    (context) => approvalProvisionController(context),
+    {
+      detail: {
+        summary: "Approve account provision",
+        description:
+          "Activate an account by changing is_verified from false to true. Only directors can approve accounts. Returns 201 if already verified.",
+        tags: ["Accounts"],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["operationType", "email"],
+                properties: {
+                  operationType: { type: "string", enum: ["UPDATE"] },
+                  email: { type: "string", format: "email", maxLength: 255 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description:
+              "Account was successfully verified and the updated account data is returned.",
+            content: {
+              "application/json": {
+                schema: {
+                  ...successEnvelope,
+                  properties: {
+                    ...successEnvelope.properties,
+                    status: { type: "integer", enum: [200] },
+                  },
+                },
+              },
+            },
+          },
+          201: {
+            description:
+              "Account was already verified and no changes were made.",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["success", "status", "message", "data"],
+                  properties: {
+                    success: { type: "boolean", enum: [true] },
+                    status: { type: "integer", enum: [201] },
+                    message: {
+                      type: "object",
+                      required: ["title", "description"],
+                      properties: {
+                        title: { type: "string" },
+                        description: { type: "string" },
+                      },
+                    },
+                    data: { type: "array", items: { type: "object" } },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "The request body is invalid.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          401: {
+            description: "A valid signed JWT and active session are required.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          403: {
+            description: "The authenticated account is not a director.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          404: {
+            description: "No account found with the provided email.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+        },
+      },
+    },
+  )
+  .derive(requireRoleMiddleware("admin"))
+  .post(
+    "/accounts/editfromadmin",
+    (context) => editFromAdminController(context),
+    {
+      detail: {
+        summary: "Edit account from admin",
+        description:
+          "Modify account details. Admin and director roles can edit other accounts, but director accounts cannot be edited via this method. Only directors may change the role field.",
+        tags: ["Accounts"],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["operationType", "account_id"],
+                properties: {
+                  operationType: { type: "string", enum: ["UPDATE"] },
+                  account_id: { type: "string" },
+                  email: { type: "string", format: "email", maxLength: 255 },
+                  fullname: { type: "string", maxLength: 255 },
+                  role: {
+                    type: "string",
+                    enum: ["director", "admin", "verificator", "lecturer"],
+                  },
+                  sex: { type: "string", maxLength: 6 },
+                  phone_no: { type: "string", maxLength: 15 },
+                  address: { type: "string", maxLength: 255 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Account was successfully updated.",
+            content: {
+              "application/json": {
+                schema: {
+                  ...successEnvelope,
+                  properties: {
+                    ...successEnvelope.properties,
+                    status: { type: "integer", enum: [200] },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "The request body is invalid.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          401: {
+            description: "A valid signed JWT and active session are required.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          403: {
+            description:
+              "The authenticated account is below admin role, or attempted to change role without director permissions, or attempted to edit a director account.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          404: {
+            description: "No account found with the provided ID.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          409: {
+            description: "The email conflicts with an existing account.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+        },
+      },
+    },
+  );

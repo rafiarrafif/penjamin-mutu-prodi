@@ -28,6 +28,16 @@ function getStatus(error: unknown, override?: number): number {
     if (error.code === "P2025") return 404;
   }
 
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    if (
+      message.includes("cannot be edited") ||
+      message.includes("only directors may change")
+    ) {
+      return 403;
+    }
+  }
+
   const status = error.statusCode ?? error.status;
   return typeof status === "number" && status >= 400 && status <= 599
     ? status

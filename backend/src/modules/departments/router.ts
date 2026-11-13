@@ -3,7 +3,7 @@ import "dotenv/config";
 import { jwt } from "@elysia/jwt";
 import type { OpenAPIV3 } from "openapi-types";
 import { createNewDepartmentController } from "./controllers/createNewDepartment.controller";
-import { requireDepartmentAdminMiddleware } from "./middlewares/requireDepartmentAdmin.middleware";
+import { requireRoleMiddleware } from "../../middlewares/requireRole.middleware";
 
 const responseMessage = t.Object({
   title: t.String(),
@@ -35,7 +35,7 @@ if (!jwtSecret) {
 
 export const departmentsRouter = new Elysia({ name: "departments" })
   .use(jwt({ name: "jwt", secret: jwtSecret }))
-  .derive(requireDepartmentAdminMiddleware())
+  .derive(requireRoleMiddleware("admin"))
   .post("/departments/", (context) => createNewDepartmentController(context), {
     detail: {
       summary: "Create a department",

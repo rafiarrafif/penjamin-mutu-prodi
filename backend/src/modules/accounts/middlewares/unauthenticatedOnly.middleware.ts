@@ -2,6 +2,8 @@ import type { Context } from "elysia";
 import { errorResponse } from "../../../helper/response";
 
 export function unauthenticatedOnlyMiddleware({ request, set }: Context) {
+  if (!new URL(request.url).pathname.startsWith("/accounts/auth/")) return;
+
   const authorization = request.headers.get("authorization");
   const hasBearerToken = /^Bearer\s+\S+$/i.test(authorization?.trim() ?? "");
 

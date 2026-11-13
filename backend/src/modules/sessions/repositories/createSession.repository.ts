@@ -37,17 +37,3 @@ export function createSessionRecord({
     },
   });
 }
-
-export function findActiveSessionById(sessionId: string) {
-  return prisma.session.findFirst({
-    where: { id: sessionId, revokedAt: null },
-    select: {
-      account: {
-        select: {
-          id: true,
-          role: true,
-        },
-      },
-    },
-  });
-}

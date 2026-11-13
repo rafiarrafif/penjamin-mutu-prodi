@@ -1,18 +1,18 @@
 import { prisma } from "../../../utils/prisma";
 
-export function findAccountByEmail(email: string) {
+export function findAccountForGoogleLogin(email: string) {
   return prisma.account.findUnique({
     where: { email },
     select: { id: true },
   });
 }
 
-export async function updateGoogleAccountByEmail(
+export async function updateGoogleAccountForLogin(
   email: string,
   sub: string,
   profilePicture: string | null,
 ) {
-  const account = await findAccountByEmail(email);
+  const account = await findAccountForGoogleLogin(email);
   if (!account) return null;
 
   return prisma.account.update({

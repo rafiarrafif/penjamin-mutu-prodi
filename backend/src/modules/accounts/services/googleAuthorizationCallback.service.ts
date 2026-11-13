@@ -1,7 +1,7 @@
 import { getGoogleProvider } from "../../../utils/googleOAuth";
 import { getRedisClient, getRedisKey } from "../../../utils/redis";
-import { createSession } from "../../sessions/services/sessions.service";
-import { updateGoogleAccountByEmail } from "../repositories/accounts.repository";
+import { createSession } from "../../sessions/services/createSession.service";
+import { updateGoogleAccountForLogin } from "../repositories/updateGoogleAccountForLogin.repository";
 
 export async function exchangeGoogleAuthorizationCode(
   code: string,
@@ -45,7 +45,7 @@ export async function createGoogleLoginSession(
   userAgent: string | null,
   ipAddress: string | null,
 ) {
-  const account = await updateGoogleAccountByEmail(email, sub, profilePicture);
+  const account = await updateGoogleAccountForLogin(email, sub, profilePicture);
   if (!account) return null;
 
   const session = await createSession({

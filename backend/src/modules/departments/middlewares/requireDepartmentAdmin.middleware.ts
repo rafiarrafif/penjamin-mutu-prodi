@@ -1,6 +1,6 @@
 import type { Context } from "elysia";
 import { errorResponse } from "../../../helper/response";
-import { findActiveSession } from "../../sessions/services/sessions.service";
+import { findActiveSession } from "../../sessions/services/findActiveSession.service";
 
 const ROLE_LEVEL: Record<string, number> = {
   lecturer: 0,

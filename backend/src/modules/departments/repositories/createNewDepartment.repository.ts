@@ -6,7 +6,7 @@ interface CreateDepartmentRecord {
   accountIdCreator: string;
 }
 
-export function createDepartment({
+export function createNewDepartment({
   name,
   description,
   accountIdCreator,

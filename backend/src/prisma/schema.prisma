@@ -76,7 +76,7 @@ model Department {
 
 model Account {
   id                       String                @id @db.UniqueIdentifier
-  sub                      String                @unique @db.VarChar(255)
+  sub                      String                @db.VarChar(255)
   fullname                 String                @db.VarChar(255)
   email                    String                @unique @db.VarChar(255)
   profilePicture           String?               @map("profile_picture") @db.VarChar(255)

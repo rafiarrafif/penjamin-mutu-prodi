@@ -1,6 +1,6 @@
 import type { Context } from "elysia";
-import { errorResponse } from "../../../helper/response";
-import { findActiveSession } from "../../sessions/services/sessions.service";
+import { errorResponse } from "../helper/response";
+import { findActiveSession } from "../modules/sessions/services/findActiveSession.service";
 
 const ROLE_LEVEL: Record<string, number> = {
   lecturer: 0,
@@ -10,7 +10,9 @@ const ROLE_LEVEL: Record<string, number> = {
   director: 3,
 };
 
-export function requireDepartmentAdminMiddleware() {
+export function requireRoleMiddleware(requiredRole: string) {
+  const requiredLevel = ROLE_LEVEL[requiredRole.toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
+
   return async ({
     request,
     set,
@@ -97,9 +99,7 @@ export function requireDepartmentAdminMiddleware() {
       );
     }
 
-    if (
-      (ROLE_LEVEL[session.account.role.toLowerCase()] ?? -1) < ROLE_LEVEL.admin
-    ) {
+    if ((ROLE_LEVEL[session.account.role.toLowerCase()] ?? -1) < requiredLevel) {
       return status(
         403,
         errorResponse(
@@ -107,12 +107,11 @@ export function requireDepartmentAdminMiddleware() {
           {
             status: 403,
             title: "Insufficient permissions",
-            description:
-              "Creating departments requires the admin role or higher.",
+            description: `This operation requires the ${requiredRole} role or higher.`,
             errors: [
               {
                 field: "role",
-                message: "Admin or director permissions are required.",
+                message: `The ${requiredRole} role or higher is required.`,
               },
             ],
           },
@@ -120,6 +119,9 @@ export function requireDepartmentAdminMiddleware() {
       );
     }
 
-    return { accountId: session.account.id };
+    return {
+      accountId: session.account.id,
+      accountRole: session.account.role,
+    };
   };
 }

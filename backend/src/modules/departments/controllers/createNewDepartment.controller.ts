@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { createDepartment } from "../services/departments.service";
-import { createDepartmentSchema } from "../schemas/departments.schema";
+import { createNewDepartment } from "../services/createNewDepartment.service";
+import { createNewDepartmentSchema } from "../schemas/createNewDepartment.schema";
 
 interface CreateDepartmentControllerContext {
   body: unknown;
@@ -9,16 +9,16 @@ interface CreateDepartmentControllerContext {
   accountId: string;
 }
 
-export async function createDepartmentController({
+export async function createNewDepartmentController({
   body,
   set,
   accountId,
 }: CreateDepartmentControllerContext) {
   try {
-    const parsedBody = createDepartmentSchema.safeParse(body);
+    const parsedBody = createNewDepartmentSchema.safeParse(body);
     if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    const department = await createDepartment(parsedBody.data, accountId);
+    const department = await createNewDepartment(parsedBody.data, accountId);
 
     return successResponse(
       { set },

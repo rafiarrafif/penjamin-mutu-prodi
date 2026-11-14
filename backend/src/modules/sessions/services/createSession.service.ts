@@ -1,7 +1,4 @@
-import {
-  createSessionRecord,
-  findActiveSessionById,
-} from "../repositories/sessions.repository";
+import { createSessionRecord } from "../repositories/createSession.repository";
 
 interface CreateSessionInput {
   accountId: string;
@@ -51,8 +48,4 @@ export function createSession({
     browser: getBrowser(userAgent),
     ipAddress,
   });
-}
-
-export function findActiveSession(sessionId: string) {
-  return findActiveSessionById(sessionId);
 }

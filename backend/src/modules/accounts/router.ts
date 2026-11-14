@@ -9,6 +9,7 @@ import { requireRoleMiddleware } from "../../middlewares/requireRole.middleware"
 import { createAccountController } from "./controllers/createAccount.controller";
 import { approvalProvisionController } from "./controllers/approvalProvision.controller";
 import { editFromAdminController } from "./controllers/editFromAdmin.controller";
+import { selfEditController } from "./controllers/selfEdit.controller";
 
 const successEnvelope: OpenAPIV3.SchemaObject = {
   type: "object",
@@ -404,6 +405,76 @@ export const accountsRouter = new Elysia({ name: "accounts" })
           },
           404: {
             description: "No account found with the provided ID.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          409: {
+            description: "The email conflicts with an existing account.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+        },
+      },
+    },
+  )
+  .derive(requireRoleMiddleware("lecturer"))
+  .post(
+    "/accounts/selfedit",
+    (context) => selfEditController(context),
+    {
+      detail: {
+        summary: "Edit own account",
+        description:
+          "Allow authenticated users to edit their own account details. Only directors may change their own role field.",
+        tags: ["Accounts"],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["operationType"],
+                properties: {
+                  operationType: { type: "string", enum: ["UPDATE"] },
+                  email: { type: "string", format: "email", maxLength: 255 },
+                  fullname: { type: "string", maxLength: 255 },
+                  role: {
+                    type: "string",
+                    enum: ["director", "admin", "verificator", "lecturer"],
+                  },
+                  sex: { type: "string", maxLength: 6 },
+                  phone_no: { type: "string", maxLength: 15 },
+                  address: { type: "string", maxLength: 255 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Account was successfully updated.",
+            content: {
+              "application/json": {
+                schema: {
+                  ...successEnvelope,
+                  properties: {
+                    ...successEnvelope.properties,
+                    status: { type: "integer", enum: [200] },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "The request body is invalid.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          401: {
+            description: "A valid signed JWT and active session are required.",
+            content: { "application/json": { schema: errorEnvelope } },
+          },
+          403: {
+            description:
+              "Attempted to change role field without director permissions.",
             content: { "application/json": { schema: errorEnvelope } },
           },
           409: {

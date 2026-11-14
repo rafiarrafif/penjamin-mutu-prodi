@@ -36,6 +36,12 @@ function getStatus(error: unknown, override?: number): number {
     ) {
       return 403;
     }
+    if (
+      message.includes("session not found") ||
+      message.includes("already revoked")
+    ) {
+      return 404;
+    }
   }
 
   const status = error.statusCode ?? error.status;

@@ -15,7 +15,7 @@ model DataCategory {
   name         String            @db.VarChar(255)
   requirements DataRequirement[]
 
-  @@index([slug], map: "index_2")
+  @@unique([slug], map: "index_2")
   @@map("data_categories")
 }
 
@@ -76,7 +76,7 @@ model Department {
 
 model Account {
   id                       String                @id @db.UniqueIdentifier
-  sub                      String                @db.VarChar(255)
+  sub                      String?               @unique @db.VarChar(255)
   fullname                 String                @db.VarChar(255)
   email                    String                @unique @db.VarChar(255)
   profilePicture           String?               @map("profile_picture") @db.VarChar(255)
@@ -92,12 +92,7 @@ model Account {
   notifications            AccountNotification[]
   departmentHistories      DepartmentHistory[]   @relation("DepartmentHistoryAccount")
   departmentAssignments    DepartmentHistory[]   @relation("DepartmentHistoryAssigner")
-  submittedSubmissions     Submission[]          @relation("SubmissionSubmitter")
-  reviewedSubmissions      Submission[]          @relation("SubmissionReviewer")
-  scoringMethodsCreated    ScoringMethod[]       @relation("ScoringMethodCreator")
-  scoringMethodsUpdated    ScoringMethod[]       @relation("ScoringMethodUpdater")
-  scoringFormulasCreated   ScoringFormula[]      @relation("ScoringFormulaCreator")
-  scoringFormulasUpdated   ScoringFormula[]      @relation("ScoringFormulaUpdater")
+  actionLogs               ActionLog[]
   departmentPicAssignments DepartmentPic[]       @relation("DepartmentPicAssigner")
   departmentsCreated      Department[]          @relation("DepartmentCreator")
   departmentsUpdated      Department[]          @relation("DepartmentUpdater")
@@ -117,7 +112,7 @@ model Session {
   loggedInAt   DateTime    @map("logged_in_at") @db.DateTime2
   revokedAt    DateTime?   @map("revoked_at") @db.DateTime2
   account      Account     @relation(fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  changeLogs   ChangeLog[]
+  actionLogs   ActionLog[]
 
   @@map("sessions")
 }
@@ -161,34 +156,26 @@ model DepartmentPic {
 }
 
 model Submission {
-  entryId            String    @id @map("entry_id") @db.UniqueIdentifier
-  accountIdSubmitter String    @map("account_id_submiter") @db.UniqueIdentifier
-  accountIdReviewer  String?   @map("account_id_reviewer") @db.UniqueIdentifier
-  status             String    @default("hold") @db.VarChar(8)
-  reviewerMessage    String?   @map("reviewer_message") @db.VarChar(255)
-  reviewedAt         DateTime? @map("reviewed_at") @db.DateTime2
-  createdAt          DateTime  @map("created_at") @db.DateTime2
-  updatedAt          DateTime  @map("updated_at") @db.DateTime2
-  deletedAt          DateTime? @map("deleted_at") @db.DateTime2
-  dataEntry          DataEntry @relation(fields: [entryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  submitter          Account   @relation("SubmissionSubmitter", fields: [accountIdSubmitter], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  reviewer           Account?  @relation("SubmissionReviewer", fields: [accountIdReviewer], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  entryId         String    @id @map("entry_id") @db.UniqueIdentifier
+  status          String    @default("hold") @db.VarChar(8)
+  reviewerMessage String?   @map("reviewer_message") @db.VarChar(255)
+  reviewedAt      DateTime? @map("reviewed_at") @db.DateTime2
+  createdAt       DateTime  @map("created_at") @db.DateTime2
+  updatedAt       DateTime  @map("updated_at") @db.DateTime2
+  deletedAt       DateTime? @map("deleted_at") @db.DateTime2
+  dataEntry       DataEntry @relation(fields: [entryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("submissions")
 }
 
 model ScoringMethod {
-  id               String          @id @db.UniqueIdentifier
-  name             String          @db.VarChar(255)
-  successRate      Decimal         @map("success_rate") @db.Decimal(5, 2)
-  passRate         Decimal         @map("pass_rate") @db.Decimal(5, 2)
-  accountIdCreator String          @map("account_id_creator") @db.UniqueIdentifier
-  accountIdUpdater String          @map("account_id_updater") @db.UniqueIdentifier
-  createdAt        DateTime        @map("created_at") @db.DateTime2
-  updatedAt        DateTime        @map("update_at") @db.DateTime2
-  deletedAt        DateTime?       @map("deleted_at") @db.DateTime2
-  creator          Account         @relation("ScoringMethodCreator", fields: [accountIdCreator], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  updater          Account         @relation("ScoringMethodUpdater", fields: [accountIdUpdater], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id          String           @id @db.UniqueIdentifier
+  name        String           @db.VarChar(255)
+  successRate Decimal          @map("success_rate") @db.Decimal(5, 2)
+  passRate    Decimal          @map("pass_rate") @db.Decimal(5, 2)
+  createdAt   DateTime         @map("created_at") @db.DateTime2
+  updatedAt   DateTime         @map("update_at") @db.DateTime2
+  deletedAt   DateTime?        @map("deleted_at") @db.DateTime2
   formulas         ScoringFormula[]
   results          ScoringResult[]
 
@@ -201,14 +188,10 @@ model ScoringFormula {
   attribute       String        @unique @db.VarChar(255)
   attributeType   String        @map("attribute_type") @db.VarChar(10)
   description     String?       @db.VarChar(400)
-  accountIdCreator String       @map("account_id_creator") @db.UniqueIdentifier
-  accountIdUpdater String       @map("account_id_updater") @db.UniqueIdentifier
   createdAt       DateTime      @map("created_at") @db.DateTime2
   updatedAt       DateTime      @map("update_at") @db.DateTime2
   deletedAt       DateTime?     @map("deleted_at") @db.DateTime2
   scoringMethod   ScoringMethod @relation(fields: [scoringMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  creator         Account       @relation("ScoringFormulaCreator", fields: [accountIdCreator], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  updater         Account       @relation("ScoringFormulaUpdater", fields: [accountIdUpdater], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("scoring_formula")
 }
@@ -249,17 +232,19 @@ model Period {
   @@map("periods")
 }
 
-model ChangeLog {
-  id               String   @id @db.UniqueIdentifier
-  sessionIdRelated String   @map("session_id_related") @db.UniqueIdentifier
-  relatedModule    String   @map("related_module") @db.VarChar(155)
-  moduleName       String   @map("module_name") @db.VarChar(155)
-  action           String   @db.VarChar(8)
-  description      String   @db.VarChar(500)
-  createdAt        DateTime @map("created_at") @db.DateTime2
-  session          Session  @relation(fields: [sessionIdRelated], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model ActionLog {
+  id               String    @id @db.UniqueIdentifier
+  accountIdRelated String    @map("account_id_related") @db.UniqueIdentifier
+  sessionIdRelated String?   @map("session_id_related") @db.UniqueIdentifier
+  tableIdRelated   String    @map("table_id_related") @db.VarChar(155)
+  tableName        String    @map("table_name") @db.VarChar(155)
+  action           String    @db.VarChar(8)
+  description      String    @db.VarChar(500)
+  createdAt        DateTime  @map("created_at") @db.DateTime2
+  account          Account   @relation(fields: [accountIdRelated], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session          Session?  @relation(fields: [sessionIdRelated], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("change_logs")
+  @@map("action_logs")
 }
 
 model FailedLoginLog {

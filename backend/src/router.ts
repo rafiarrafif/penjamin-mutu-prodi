@@ -3,6 +3,7 @@ import { openapi } from "@elysia/openapi";
 import { accountsRouter } from "./modules/accounts/router";
 import { sessionsRouter } from "./modules/sessions/router";
 import { departmentsRouter } from "./modules/departments/router";
+import { documentsRouter } from "./modules/documents/router";
 
 export const router = new Elysia()
   .use(
@@ -22,4 +23,5 @@ export const router = new Elysia()
   )
   .use(accountsRouter)
   .use(sessionsRouter)
-  .use(departmentsRouter);
+  .use(departmentsRouter)
+  .use(documentsRouter);

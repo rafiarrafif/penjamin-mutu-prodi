@@ -8,12 +8,14 @@ import { requireRoleMiddleware } from "../../middlewares/requireRole.middleware"
 import { createAccountController } from "./controllers/createAccount.controller";
 import { approvalProvisionController } from "./controllers/approvalProvision.controller";
 import { editFromAdminController } from "./controllers/editFromAdmin.controller";
+import { deleteFromAdminController } from "./controllers/deleteFromAdmin.controller";
 import { selfEditController } from "./controllers/selfEdit.controller";
 import { requestGoogleAuthorizationDocumentation } from "./documentations/requestGoogleAuthorization.documentation";
 import { googleAuthorizationCallbackDocumentation } from "./documentations/googleAuthorizationCallback.documentation";
 import { createAccountDocumentation } from "./documentations/createAccount.documentation";
 import { approvalProvisionDocumentation } from "./documentations/approvalProvision.documentation";
 import { editFromAdminDocumentation } from "./documentations/editFromAdmin.documentation";
+import { deleteFromAdminDocumentation } from "./documentations/deleteFromAdmin.documentation";
 import { selfEditDocumentation } from "./documentations/selfEdit.documentation";
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -38,7 +40,7 @@ export const accountsRouter = new Elysia({ name: "accounts" })
   })
   .derive(requireRoleMiddleware("director"))
   .post(
-    "/accounts/approvalProvision",
+    "/accounts/approvalprovision",
     (context) => approvalProvisionController(context),
     { detail: approvalProvisionDocumentation },
   )
@@ -47,6 +49,11 @@ export const accountsRouter = new Elysia({ name: "accounts" })
     "/accounts/editfromadmin",
     (context) => editFromAdminController(context),
     { detail: editFromAdminDocumentation },
+  )
+  .post(
+    "/accounts/deletefromadmin",
+    (context) => deleteFromAdminController(context),
+    { detail: deleteFromAdminDocumentation },
   )
   .derive(requireRoleMiddleware("lecturer"))
   .post("/accounts/selfedit", (context) => selfEditController(context), {

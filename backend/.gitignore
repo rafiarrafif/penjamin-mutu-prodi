@@ -43,6 +43,7 @@ package-lock.json
 **/*.bun
 
 AGENTS.md
+AGENT_TASKS*
 .agents
 .env
 *.env

@@ -8,11 +8,15 @@ export function findDataCategoryBySlug(categorySlug: string) {
 }
 
 export function createDataCategory(name: string, categorySlug: string) {
+  const now = new Date();
+
   return prisma.dataCategory.create({
     data: {
       id: crypto.randomUUID(),
       name,
       slug: categorySlug,
+      createdAt: now,
+      updatedAt: now,
     },
   });
 }

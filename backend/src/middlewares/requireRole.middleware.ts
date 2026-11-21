@@ -11,7 +11,8 @@ const ROLE_LEVEL: Record<string, number> = {
 };
 
 export function requireRoleMiddleware(requiredRole: string) {
-  const requiredLevel = ROLE_LEVEL[requiredRole.toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
+  const requiredLevel =
+    ROLE_LEVEL[requiredRole.toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
 
   return async ({
     request,
@@ -99,7 +100,9 @@ export function requireRoleMiddleware(requiredRole: string) {
       );
     }
 
-    if ((ROLE_LEVEL[session.account.role.toLowerCase()] ?? -1) < requiredLevel) {
+    if (
+      (ROLE_LEVEL[session.account.role.toLowerCase()] ?? -1) < requiredLevel
+    ) {
       return status(
         403,
         errorResponse(
@@ -122,6 +125,7 @@ export function requireRoleMiddleware(requiredRole: string) {
     return {
       accountId: session.account.id,
       accountRole: session.account.role,
+      sessionId: claims.session_id,
     };
   };
 }

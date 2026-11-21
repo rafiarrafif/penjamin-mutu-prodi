@@ -1,6 +1,55 @@
-Table "dbo"."accounts" {
+Table "dbo"."data_categories" {
   "id" uniqueidentifier [pk, not null]
-  "sub" varchar(255) [unique, not null]
+  "slug" varchar(255) [not null]
+  "name" varchar(255) [not null]
+  "created_at" datetime2 [not null]
+  "update_at" datetime2 [not null]
+  "deleted_at" datetime2
+
+  Indexes {
+    slug [unique, name: "index_2"]
+  }
+}
+
+Table "dbo"."data_requirements" {
+  "data_category_id" uniqueidentifier [not null, ref: > "dbo"."data_categories"."id"]
+  "id" uniqueidentifier [pk, not null]
+  "frequency_code" varchar(32) [not null, ref: > "dbo"."frequencies"."code"]
+  "name" varchar(500) [not null]
+  "created_at" datetime2 [not null]
+  "update_at" datetime2 [not null]
+  "deleted_at" datetime2
+}
+
+Table "dbo"."data_entries" {
+  "data_requirement_id" uniqueidentifier [not null, ref: > "dbo"."data_requirements"."id"]
+  "id" uniqueidentifier [pk, not null, ref: - "dbo"."file_uploads"."data_entry_id", ref: - "dbo"."submissions"."data_entry_id"]
+  "period_id" uniqueidentifier [not null, ref: > "dbo"."periods"."id"]
+  "filename" varchar(255) [not null]
+  "filetype" varchar(12) [not null, note: 'enum: pdf, docx, doc, txt, rtf, odt, xlsx, xls, ods, csv, pptx, ppt, odp, jpg, jpeg, png, zip, rar, 7z']
+  "file_size" int [not null]
+  "is_secret" bit [not null]
+}
+
+Table "dbo"."file_uploads" {
+  "data_entry_id" uniqueidentifier [pk, not null]
+  "blob" varchar(500) [not null]
+}
+
+Table "dbo"."departments" {
+  "id" uniqueidentifier [pk, not null]
+  "name" varchar(115) [not null]
+  "description" varchar(255)
+  "account_id_creator" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "account_id_updater" uniqueidentifier [ref: > "dbo"."accounts"."id"]
+  "created_at" datetime2 [not null]
+  "updated_at" datetime2 [not null]
+  "deleted_at" datetime2
+}
+
+Table "dbo"."accounts" {
+  "id" uniqueidentifier [not null]
+  "sub" varchar(255) [not null]
   "fullname" varchar(255) [not null]
   "email" varchar(255) [unique, not null]
   "profile_picture" varchar(255)
@@ -12,49 +61,10 @@ Table "dbo"."accounts" {
   "updated_at" datetime2 [not null]
   "created_at" datetime2 [not null]
   "deleted_at" datetime2
-}
-
-Table "dbo"."scoring_result" {
-  "data_entry_id" uniqueidentifier [not null, ref: > "dbo"."data_entries"."id"]
-  "scoring_method_id" uniqueidentifier [not null, ref: > "dbo"."scoring_methods"."id"]
-  "proof_link" varchar(255) [not null]
-  "period" varchar(255) [not null]
 
   Indexes {
-    (data_entry_id, scoring_method_id) [pk]
+    (id, sub) [pk]
   }
-}
-
-Table "dbo"."scoring_formula" {
-  "id" uniqueidentifier [pk, not null]
-  "scoring_method_id" uniqueidentifier [not null, ref: > "dbo"."scoring_methods"."id"]
-  "attribute" varchar(255) [unique, not null]
-  "attribute_type" varchar(10) [not null, note: 'enum: variable, hasil']
-  "description" varchar(400)
-  "created_at" datetime2 [not null]
-  "update_at" datetime2 [not null]
-  "deleted_at" datetime2
-}
-
-Table "dbo"."action_logs" {
-  "id" uniqueidentifier [pk, not null]
-  "account_id_related" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
-  "session_id_related" uniqueidentifier [ref: > "dbo"."sessions"."id"]
-  "table_id_related" varchar(155) [not null]
-  "table_name" varchar(155) [not null]
-  "action" varchar(8) [not null, note: 'enum: create, read, update, delete, purge']
-  "description" varchar(500) [not null]
-  "created_at" datetime2 [not null]
-}
-
-Table "dbo"."department_histories" {
-  "id" uniqueidentifier [pk, not null]
-  "account_id" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
-  "department_id" uniqueidentifier [not null, ref: > "dbo"."departments"."id"]
-  "start_date" date [not null]
-  "end_date" date
-  "account_id_assigner" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
-  "created_at" datetime2 [not null]
 }
 
 Table "dbo"."sessions" {
@@ -70,8 +80,36 @@ Table "dbo"."sessions" {
   "revoked_at" datetime2
 }
 
+Table "dbo"."account_notification" {
+  "id" uniqueidentifier [pk, not null]
+  "account_id" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "title" varchar(500) [not null]
+  "description" varchar(500) [not null]
+}
+
+Table "dbo"."department_histories" {
+  "id" uniqueidentifier [pk, not null]
+  "account_id" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "department_id" uniqueidentifier [not null, ref: > "dbo"."departments"."id"]
+  "start_date" date [not null]
+  "end_date" date
+  "account_id_assigner" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "created_at" datetime2 [not null]
+}
+
+Table "dbo"."department_pics" {
+  "department_id" uniqueidentifier [not null, ref: > "dbo"."departments"."id"]
+  "data_requirement_id" uniqueidentifier [not null, ref: > "dbo"."data_requirements"."id"]
+  "account_id_assigner" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "created_at" datetime2 [not null]
+
+  Indexes {
+    (department_id, data_requirement_id) [pk]
+  }
+}
+
 Table "dbo"."submissions" {
-  "entry_id" uniqueidentifier [pk, not null]
+  "data_entry_id" uniqueidentifier [pk, not null]
   "status" varchar(8) [not null, default: 'hold', note: 'enum: hold, accept, reject, revision']
   "reviewer_message" varchar(255)
   "reviewed_at" datetime2
@@ -80,42 +118,41 @@ Table "dbo"."submissions" {
   "deleted_at" datetime2
 }
 
-Table "dbo"."frequencies" {
-  "code" varchar(32) [pk, not null]
-  "label" varchar(225) [not null]
+Table "dbo"."scoring_methods" {
+  "id" uniqueidentifier [pk, not null]
+  "name" varchar(255) [not null]
+  "success_rate" numeric(5,2) [not null]
+  "pass_rate" numeric(5,2) [not null]
+  "created_at" datetime2 [not null]
+  "update_at" datetime2 [not null]
+  "deleted_at" datetime2
 }
 
-Table "dbo"."department_pics" {
-  "department_id" uniqueidentifier [not null, ref: > "dbo"."departments"."id"]
-  "requirement_id" uniqueidentifier [not null, ref: > "dbo"."data_requirements"."id"]
-  "account_id_assigner" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+Table "dbo"."scoring_formula" {
+  "id" uniqueidentifier [pk, not null]
+  "scoring_method_id" uniqueidentifier [not null, ref: > "dbo"."scoring_methods"."id"]
+  "attribute" varchar(255) [unique, not null]
+  "attribute_type" varchar(10) [not null, note: 'enum: variable, hasil']
+  "description" varchar(400)
   "created_at" datetime2 [not null]
+  "update_at" datetime2 [not null]
+  "deleted_at" datetime2
+}
+
+Table "dbo"."scoring_result" {
+  "data_entry_id" uniqueidentifier [not null, ref: > "dbo"."data_entries"."id"]
+  "scoring_method_id" uniqueidentifier [not null, ref: > "dbo"."scoring_methods"."id"]
+  "proof_link" varchar(255) [not null]
+  "period" varchar(255) [not null]
 
   Indexes {
-    (department_id, requirement_id) [pk]
+    (data_entry_id, scoring_method_id) [pk]
   }
 }
 
-Table "dbo"."data_entries" {
-  "data_requirement_id" uniqueidentifier [not null, ref: > "dbo"."data_requirements"."id"]
-  "id" uniqueidentifier [pk, not null, ref: - "dbo"."file_uploads"."data_entry_id", ref: - "dbo"."submissions"."entry_id"]
-  "period_id" uniqueidentifier [not null, ref: > "dbo"."periods"."id"]
-  "filename" varchar(255) [not null]
-  "filetype" varchar(12) [not null, note: 'enum: pdf, docx, doc, txt, rtf, odt, xlsx, xls, ods, csv, pptx, ppt, odp, jpg, jpeg, png, zip, rar, 7z']
-  "file_size" int [not null]
-  "is_secret" bit [not null]
-}
-
-Table "dbo"."file_uploads" {
-  "data_entry_id" uniqueidentifier [pk, not null]
-  "blob" varchar(500) [not null]
-}
-
-Table "dbo"."data_requirements" {
-  "data_category_id" uniqueidentifier [not null, ref: > "dbo"."data_categories"."id"]
-  "id" uniqueidentifier [pk, not null]
-  "frequency_code" varchar(32) [not null, ref: > "dbo"."frequencies"."code"]
-  "name" varchar(500) [not null]
+Table "dbo"."frequencies" {
+  "code" varchar(32) [pk, not null]
+  "label" varchar(225) [not null]
 }
 
 Table "dbo"."periods" {
@@ -129,50 +166,27 @@ Table "dbo"."periods" {
   "end_date" date [not null]
 }
 
-Table "dbo"."data_categories" {
+Table "dbo"."action_logs" {
   "id" uniqueidentifier [pk, not null]
-  "slug" varchar(255) [not null]
-  "name" varchar(255) [not null]
-
-  Indexes {
-    slug [unique, name: "index_2"]
-  }
-}
-
-Table "dbo"."departments" {
-  "id" uniqueidentifier [pk, not null]
-  "name" varchar(115) [not null]
-  "description" varchar(255)
-  "account_id_creator" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
-  "account_id_updater" uniqueidentifier [ref: > "dbo"."accounts"."id"]
+  "account_id_related" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
+  "session_id_related" uniqueidentifier [ref: > "dbo"."sessions"."id"]
+  "table_id_related" varchar(155) [not null]
+  "table_name" varchar(155) [not null]
+  "action" varchar(8) [not null, note: 'enum: create, read, update, delete, purge']
+  "description" varchar(500) [not null]
   "created_at" datetime2 [not null]
-  "updated_at" datetime2 [not null]
-  "deleted_at" datetime2
 }
 
 Table "dbo"."failed_login_logs" {
-  "id" uniqueidentifier [pk, not null]
+  "id" uniqueidentifier [not null]
   "email" varchar(255) [not null]
   "name" varchar(255)
   "ip_address" varchar(45)
   "device_info" varchar(255)
   "browser_info" varchar(255)
   "attempt_at" datetime2 [not null]
-}
 
-Table "dbo"."scoring_methods" {
-  "id" uniqueidentifier [pk, not null]
-  "name" varchar(255) [not null]
-  "success_rate" numeric(5,2) [not null]
-  "pass_rate" numeric(5,2) [not null]
-  "created_at" datetime2 [not null]
-  "update_at" datetime2 [not null]
-  "deleted_at" datetime2
-}
-
-Table "dbo"."account_notification" {
-  "id" uniqueidentifier [pk, not null]
-  "account_id" uniqueidentifier [not null, ref: > "dbo"."accounts"."id"]
-  "title" varchar(500) [not null]
-  "description" varchar(500) [not null]
+  Indexes {
+    (id, email) [pk]
+  }
 }

@@ -81,7 +81,7 @@ model Department {
 }
 
 model Account {
-  id                       String                @id @db.UniqueIdentifier
+  id                       String                @unique @db.UniqueIdentifier
   sub                      String                @db.VarChar(255)
   fullname                 String                @db.VarChar(255)
   email                    String                @unique @db.VarChar(255)
@@ -103,6 +103,7 @@ model Account {
   departmentsCreated      Department[]          @relation("DepartmentCreator")
   departmentsUpdated      Department[]          @relation("DepartmentUpdater")
 
+  @@id([id, sub])
   @@map("accounts")
 }
 
@@ -162,14 +163,14 @@ model DepartmentPic {
 }
 
 model Submission {
-  entryId         String    @id @map("entry_id") @db.UniqueIdentifier
+  dataEntryId     String    @id @map("data_entry_id") @db.UniqueIdentifier
   status          String    @default("hold") @db.VarChar(8)
   reviewerMessage String?   @map("reviewer_message") @db.VarChar(255)
   reviewedAt      DateTime? @map("reviewed_at") @db.DateTime2
   createdAt       DateTime  @map("created_at") @db.DateTime2
   updatedAt       DateTime  @map("updated_at") @db.DateTime2
   deletedAt       DateTime? @map("deleted_at") @db.DateTime2
-  dataEntry       DataEntry @relation(fields: [entryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dataEntry       DataEntry @relation(fields: [dataEntryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("submissions")
 }
@@ -254,7 +255,7 @@ model ActionLog {
 }
 
 model FailedLoginLog {
-  id          String    @id @db.UniqueIdentifier
+  id          String    @db.UniqueIdentifier
   email       String    @db.VarChar(255)
   name        String?   @db.VarChar(255)
   ipAddress   String?   @map("ip_address") @db.VarChar(45)
@@ -262,5 +263,6 @@ model FailedLoginLog {
   browserInfo String?   @map("browser_info") @db.VarChar(255)
   attemptAt   DateTime  @map("attempt_at") @db.DateTime2
 
+  @@id([id, email])
   @@map("failed_login_logs")
 }

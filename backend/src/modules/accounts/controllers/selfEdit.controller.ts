@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { selfEdit } from "../services/selfEdit.service";
 import { selfEditSchema } from "../schemas/selfEdit.schema";
+import type { SelfEditService } from "../services/selfEdit.service";
 
 interface SelfEditControllerContext {
   body: unknown;
@@ -10,28 +10,36 @@ interface SelfEditControllerContext {
   accountRole: string;
 }
 
-export async function selfEditController({
-  body,
-  set,
-  accountId,
-  accountRole,
-}: SelfEditControllerContext) {
-  try {
-    const parsedBody = selfEditSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class SelfEditController {
+  constructor(private readonly service: SelfEditService) {}
 
-    const updatedAccount = await selfEdit(accountId, parsedBody.data, accountRole);
+  async handle({
+    body,
+    set,
+    accountId,
+    accountRole,
+  }: SelfEditControllerContext) {
+    try {
+      const parsedBody = selfEditSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Account updated",
-        description: "Your account was updated successfully.",
-        data: [updatedAccount],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const updatedAccount = await this.service.execute(
+        accountId,
+        parsedBody.data,
+        accountRole,
+      );
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Account updated",
+          description: "Your account was updated successfully.",
+          data: [updatedAccount],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { createSessionRecord } from "../repositories/createSession.repository";
+import type { CreateSessionRepositoryPort } from "../repositories/createSession.repository";
 
 interface CreateSessionInput {
   accountId: string;
@@ -36,16 +36,16 @@ function getBrowser(userAgent: string | null): string | null {
   return "Other";
 }
 
-export function createSession({
-  accountId,
-  userAgent,
-  ipAddress,
-}: CreateSessionInput) {
-  return createSessionRecord({
-    accountId,
-    deviceType: getDeviceType(userAgent),
-    deviceOs: getDeviceOs(userAgent),
-    browser: getBrowser(userAgent),
-    ipAddress,
-  });
+export class CreateSessionService {
+  constructor(private readonly repository: CreateSessionRepositoryPort) {}
+
+  execute({ accountId, userAgent, ipAddress }: CreateSessionInput) {
+    return this.repository.create({
+      accountId,
+      deviceType: getDeviceType(userAgent),
+      deviceOs: getDeviceOs(userAgent),
+      browser: getBrowser(userAgent),
+      ipAddress,
+    });
+  }
 }

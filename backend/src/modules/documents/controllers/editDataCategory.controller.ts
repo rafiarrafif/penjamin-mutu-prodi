@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { editDataCategory } from "../services/editDataCategory.service";
 import { editDataCategorySchema } from "../schemas/editDataCategory.schema";
+import type { EditDataCategoryService } from "../services/editDataCategory.service";
 
 interface EditDataCategoryControllerContext {
   body: unknown;
@@ -10,32 +10,36 @@ interface EditDataCategoryControllerContext {
   sessionId: string;
 }
 
-export async function editDataCategoryController({
-  body,
-  set,
-  accountId,
-  sessionId,
-}: EditDataCategoryControllerContext) {
-  try {
-    const parsedBody = editDataCategorySchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class EditDataCategoryController {
+  constructor(private readonly service: EditDataCategoryService) {}
 
-    const category = await editDataCategory(
-      parsedBody.data,
-      accountId,
-      sessionId,
-    );
+  async handle({
+    body,
+    set,
+    accountId,
+    sessionId,
+  }: EditDataCategoryControllerContext) {
+    try {
+      const parsedBody = editDataCategorySchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Data category updated",
-        description: "The data category was updated successfully.",
-        data: [category],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const category = await this.service.execute(
+        parsedBody.data,
+        accountId,
+        sessionId,
+      );
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Data category updated",
+          description: "The data category was updated successfully.",
+          data: [category],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

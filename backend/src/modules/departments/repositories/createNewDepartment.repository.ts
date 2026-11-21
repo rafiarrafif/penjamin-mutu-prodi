@@ -1,27 +1,30 @@
-import { prisma } from "../../../utils/prisma";
+import type { prisma } from "../../../utils/prisma";
 
-interface CreateDepartmentRecord {
+export interface CreateDepartmentRecord {
   name: string;
   description?: string;
   accountIdCreator: string;
 }
 
-export function createNewDepartment({
-  name,
-  description,
-  accountIdCreator,
-}: CreateDepartmentRecord) {
-  const now = new Date();
+export interface CreateNewDepartmentRepositoryPort {
+  create(input: CreateDepartmentRecord): Promise<unknown>;
+}
 
-  return prisma.department.create({
-    data: {
-      id: crypto.randomUUID(),
-      name,
-      description: description ?? null,
-      accountIdCreator,
-      accountIdUpdater: null,
-      createdAt: now,
-      updatedAt: now,
-    },
-  });
+export class CreateNewDepartmentRepository implements CreateNewDepartmentRepositoryPort {
+  constructor(private readonly db: typeof prisma) {}
+
+  create({ name, description, accountIdCreator }: CreateDepartmentRecord) {
+    const now = new Date();
+    return this.db.department.create({
+      data: {
+        id: crypto.randomUUID(),
+        name,
+        description: description ?? null,
+        accountIdCreator,
+        accountIdUpdater: null,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+  }
 }

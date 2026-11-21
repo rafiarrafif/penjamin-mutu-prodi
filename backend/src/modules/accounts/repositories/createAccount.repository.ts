@@ -1,6 +1,6 @@
-import { prisma } from "../../../utils/prisma";
+import type { prisma } from "../../../utils/prisma";
 
-interface CreateAccountRecord {
+export interface CreateAccountRecord {
   fullname: string;
   email: string;
   role: "director" | "admin" | "verificator" | "lecturer";
@@ -10,31 +10,39 @@ interface CreateAccountRecord {
   isVerified: boolean;
 }
 
-export function createAccount({
-  fullname,
-  email,
-  role,
-  sex,
-  phoneNo,
-  address,
-  isVerified,
-}: CreateAccountRecord) {
-  const now = new Date();
+export interface CreateAccountRepositoryPort {
+  create(input: CreateAccountRecord): Promise<unknown>;
+}
 
-  return prisma.account.create({
-    data: {
-      id: crypto.randomUUID(),
-      sub: "n/a",
-      fullname,
-      email,
-      profilePicture: null,
-      role,
-      sex,
-      phoneNo: phoneNo ?? null,
-      address: address ?? null,
-      isVerified,
-      createdAt: now,
-      updatedAt: now,
-    },
-  });
+export class CreateAccountRepository implements CreateAccountRepositoryPort {
+  constructor(private readonly db: typeof prisma) {}
+
+  create({
+    fullname,
+    email,
+    role,
+    sex,
+    phoneNo,
+    address,
+    isVerified,
+  }: CreateAccountRecord) {
+    const now = new Date();
+
+    return this.db.account.create({
+      data: {
+        id: crypto.randomUUID(),
+        sub: "n/a",
+        fullname,
+        email,
+        profilePicture: null,
+        role,
+        sex,
+        phoneNo: phoneNo ?? null,
+        address: address ?? null,
+        isVerified,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+  }
 }

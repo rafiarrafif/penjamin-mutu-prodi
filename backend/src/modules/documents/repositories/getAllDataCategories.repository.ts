@@ -1,8 +1,16 @@
 import { prisma } from "../../../utils/prisma";
 
-export function getAllDataCategories() {
-  return prisma.dataCategory.findMany({
-    where: { deletedAt: null },
-    orderBy: { name: "asc" },
-  });
+export interface GetAllDataCategoriesRepositoryPort {
+  findAll(): Promise<unknown[]>;
+}
+
+export class GetAllDataCategoriesRepository implements GetAllDataCategoriesRepositoryPort {
+  constructor(private readonly db: typeof prisma) {}
+
+  async findAll() {
+    return this.db.dataCategory.findMany({
+      where: { deletedAt: null },
+      orderBy: { name: "asc" },
+    });
+  }
 }

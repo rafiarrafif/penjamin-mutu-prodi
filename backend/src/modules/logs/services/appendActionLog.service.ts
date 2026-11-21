@@ -1,8 +1,12 @@
-import {
-  appendActionLog as appendActionLogRecord,
-  type AppendActionLogRecord,
+import type {
+  AppendActionLogRecord,
+  AppendActionLogRepositoryPort,
 } from "../repositories/appendActionLog.repository";
 
-export function appendActionLog(record: AppendActionLogRecord) {
-  return appendActionLogRecord(record);
+export class AppendActionLogService {
+  constructor(private readonly repository: AppendActionLogRepositoryPort) {}
+
+  execute(record: AppendActionLogRecord) {
+    return this.repository.append(record);
+  }
 }

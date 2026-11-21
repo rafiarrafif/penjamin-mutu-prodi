@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { deleteDataCategory } from "../services/deleteDataCategory.service";
 import { deleteDataCategorySchema } from "../schemas/deleteDataCategory.schema";
+import type { DeleteDataCategoryService } from "../services/deleteDataCategory.service";
 
 interface DeleteDataCategoryControllerContext {
   body: unknown;
@@ -10,32 +10,36 @@ interface DeleteDataCategoryControllerContext {
   sessionId: string;
 }
 
-export async function deleteDataCategoryController({
-  body,
-  set,
-  accountId,
-  sessionId,
-}: DeleteDataCategoryControllerContext) {
-  try {
-    const parsedBody = deleteDataCategorySchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class DeleteDataCategoryController {
+  constructor(private readonly service: DeleteDataCategoryService) {}
 
-    const category = await deleteDataCategory(
-      parsedBody.data,
-      accountId,
-      sessionId,
-    );
+  async handle({
+    body,
+    set,
+    accountId,
+    sessionId,
+  }: DeleteDataCategoryControllerContext) {
+    try {
+      const parsedBody = deleteDataCategorySchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Data category deleted",
-        description: "The data category was soft deleted successfully.",
-        data: [category],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const category = await this.service.execute(
+        parsedBody.data,
+        accountId,
+        sessionId,
+      );
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Data category deleted",
+          description: "The data category was soft deleted successfully.",
+          data: [category],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

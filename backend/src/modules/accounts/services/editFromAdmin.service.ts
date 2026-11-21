@@ -1,4 +1,4 @@
-import { findAccountById, updateAccount } from "../repositories/editFromAdmin.repository";
+import type { EditFromAdminRepositoryPort } from "../repositories/editFromAdmin.repository";
 
 interface EditFromAdminInput {
   account_id: string;
@@ -10,34 +10,31 @@ interface EditFromAdminInput {
   address?: string;
 }
 
-export async function editFromAdmin(
-  input: EditFromAdminInput,
-  requesterRole: string,
-) {
-  const account = await findAccountById(input.account_id);
+export class EditFromAdminService {
+  constructor(private readonly repository: EditFromAdminRepositoryPort) {}
 
-  if (!account) {
-    throw new Error("Account not found with the provided ID.");
+  async execute(input: EditFromAdminInput, requesterRole: string) {
+    const account = await this.repository.findById(input.account_id);
+
+    if (!account) {
+      throw new Error("Account not found with the provided ID.");
+    }
+
+    if (account.role === "director") {
+      throw new Error("Director accounts cannot be edited via this method.");
+    }
+
+    if (input.role && requesterRole.toLowerCase() !== "director") {
+      throw new Error("Only directors may change the role field.");
+    }
+
+    return this.repository.update(input.account_id, {
+      email: input.email,
+      fullname: input.fullname,
+      role: input.role,
+      sex: input.sex,
+      phoneNo: input.phone_no,
+      address: input.address,
+    });
   }
-
-  if (account.role === "director") {
-    throw new Error("Director accounts cannot be edited via this method.");
-  }
-
-  if (input.role && requesterRole.toLowerCase() !== "director") {
-    throw new Error("Only directors may change the role field.");
-  }
-
-  const updateData = {
-    email: input.email,
-    fullname: input.fullname,
-    role: input.role,
-    sex: input.sex,
-    phoneNo: input.phone_no,
-    address: input.address,
-  };
-
-  const updatedAccount = await updateAccount(input.account_id, updateData);
-
-  return updatedAccount;
 }

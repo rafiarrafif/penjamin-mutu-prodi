@@ -1,12 +1,16 @@
-import { prisma } from "../../../utils/prisma";
+import type { prisma } from "../../../utils/prisma";
 
-export function getSpecificDataCategory(categoryId: string) {
-  return prisma.dataCategory.findFirst({
-    where: { id: categoryId, deletedAt: null },
-    include: {
-      requirements: {
-        where: { deletedAt: null },
-      },
-    },
-  });
+export interface GetSpecificDataCategoryRepositoryPort {
+  findById(categoryId: string): Promise<unknown | null>;
+}
+
+export class GetSpecificDataCategoryRepository implements GetSpecificDataCategoryRepositoryPort {
+  constructor(private readonly db: typeof prisma) {}
+
+  findById(categoryId: string) {
+    return this.db.dataCategory.findFirst({
+      where: { id: categoryId, deletedAt: null },
+      include: { requirements: { where: { deletedAt: null } } },
+    });
+  }
 }

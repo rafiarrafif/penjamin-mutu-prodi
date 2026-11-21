@@ -1,33 +1,34 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { deleteAccountFromAdmin } from "../services/deleteFromAdmin.service";
 import { deleteFromAdminSchema } from "../schemas/deleteFromAdmin.schema";
+import type { DeleteFromAdminService } from "../services/deleteFromAdmin.service";
 
 interface DeleteFromAdminControllerContext {
   body: unknown;
   set: { status?: number | string };
 }
 
-export async function deleteFromAdminController({
-  body,
-  set,
-}: DeleteFromAdminControllerContext) {
-  try {
-    const parsedBody = deleteFromAdminSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class DeleteFromAdminController {
+  constructor(private readonly service: DeleteFromAdminService) {}
 
-    const deletedAccount = await deleteAccountFromAdmin(parsedBody.data);
+  async handle({ body, set }: DeleteFromAdminControllerContext) {
+    try {
+      const parsedBody = deleteFromAdminSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Account deleted",
-        description: "The account was deleted successfully.",
-        data: [deletedAccount],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const deletedAccount = await this.service.execute(parsedBody.data);
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Account deleted",
+          description: "The account was deleted successfully.",
+          data: [deletedAccount],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

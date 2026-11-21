@@ -1,6 +1,6 @@
 import type { Context } from "elysia";
 import { errorResponse } from "../helper/response";
-import { findActiveSession } from "../modules/sessions/services/findActiveSession.service";
+import type { FindActiveSessionService } from "../modules/sessions/services/findActiveSession.service";
 
 const ROLE_LEVEL: Record<string, number> = {
   lecturer: 0,
@@ -10,7 +10,10 @@ const ROLE_LEVEL: Record<string, number> = {
   director: 3,
 };
 
-export function requireRoleMiddleware(requiredRole: string) {
+export function requireRoleMiddleware(
+  requiredRole: string,
+  activeSessionService: FindActiveSessionService,
+) {
   const requiredLevel =
     ROLE_LEVEL[requiredRole.toLowerCase()] ?? Number.MAX_SAFE_INTEGER;
 
@@ -75,7 +78,7 @@ export function requireRoleMiddleware(requiredRole: string) {
       );
     }
 
-    const session = await findActiveSession(claims.session_id);
+    const session = await activeSessionService.execute(claims.session_id);
     if (
       !session ||
       session.account.id !== (claims.account as Record<string, unknown>).id

@@ -1,6 +1,12 @@
 import type { GetAllDataCategoriesInput } from "../schemas/getAllDataCategories.schema";
-import { getAllDataCategories as getAllDataCategoriesRecord } from "../repositories/getAllDataCategories.repository";
+import type { GetAllDataCategoriesRepositoryPort } from "../repositories/getAllDataCategories.repository";
 
-export async function getAllDataCategories(_input: GetAllDataCategoriesInput) {
-  return getAllDataCategoriesRecord();
+export class GetAllDataCategoriesService {
+  constructor(
+    private readonly repository: GetAllDataCategoriesRepositoryPort,
+  ) {}
+
+  async execute(_input: GetAllDataCategoriesInput) {
+    return this.repository.findAll();
+  }
 }

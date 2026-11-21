@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { editFromAdmin } from "../services/editFromAdmin.service";
 import { editFromAdminSchema } from "../schemas/editFromAdmin.schema";
+import type { EditFromAdminService } from "../services/editFromAdmin.service";
 
 interface EditFromAdminControllerContext {
   body: unknown;
@@ -9,30 +9,30 @@ interface EditFromAdminControllerContext {
   accountRole: string;
 }
 
-export async function editFromAdminController({
-  body,
-  set,
-  accountRole,
-}: EditFromAdminControllerContext) {
-  try {
-    const parsedBody = editFromAdminSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class EditFromAdminController {
+  constructor(private readonly service: EditFromAdminService) {}
 
-    const updatedAccount = await editFromAdmin(
-      parsedBody.data,
-      accountRole,
-    );
+  async handle({ body, set, accountRole }: EditFromAdminControllerContext) {
+    try {
+      const parsedBody = editFromAdminSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Account updated",
-        description: "The account was updated successfully.",
-        data: [updatedAccount],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const updatedAccount = await this.service.execute(
+        parsedBody.data,
+        accountRole,
+      );
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Account updated",
+          description: "The account was updated successfully.",
+          data: [updatedAccount],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

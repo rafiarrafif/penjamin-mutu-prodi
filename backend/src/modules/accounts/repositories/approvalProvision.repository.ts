@@ -1,24 +1,35 @@
-import { prisma } from "../../../utils/prisma";
+import type { prisma } from "../../../utils/prisma";
 
-export async function findAccountByEmail(email: string) {
-  return prisma.account.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      email: true,
-      fullname: true,
-      role: true,
-      isVerified: true,
-    },
-  });
+export interface ApprovalProvisionRepositoryPort {
+  findByEmail(
+    email: string,
+  ): Promise<{
+    id: string;
+    email: string;
+    fullname: string;
+    role: string;
+    isVerified: boolean;
+  } | null>;
+  verify(accountId: string): Promise<unknown>;
 }
-
-export async function updateAccountVerification(accountId: string) {
-  return prisma.account.update({
-    where: { id: accountId },
-    data: {
-      isVerified: true,
-      updatedAt: new Date(),
-    },
-  });
+export class ApprovalProvisionRepository implements ApprovalProvisionRepositoryPort {
+  constructor(private readonly db: typeof prisma) {}
+  findByEmail(email: string) {
+    return this.db.account.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        fullname: true,
+        role: true,
+        isVerified: true,
+      },
+    });
+  }
+  verify(accountId: string) {
+    return this.db.account.update({
+      where: { id: accountId },
+      data: { isVerified: true, updatedAt: new Date() },
+    });
+  }
 }

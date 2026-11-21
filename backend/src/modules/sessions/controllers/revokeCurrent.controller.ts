@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { revokeCurrent } from "../services/revokeCurrent.service";
 import { revokeCurrentSchema } from "../schemas/revokeCurrent.schema";
+import type { RevokeCurrentService } from "../services/revokeCurrent.service";
 
 interface RevokeCurrentControllerContext {
   body: unknown;
@@ -9,26 +9,26 @@ interface RevokeCurrentControllerContext {
   sessionId: string;
 }
 
-export async function revokeCurrentController({
-  body,
-  set,
-  sessionId,
-}: RevokeCurrentControllerContext) {
-  try {
-    const parsedBody = revokeCurrentSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class RevokeCurrentController {
+  constructor(private readonly service: RevokeCurrentService) {}
 
-    await revokeCurrent(sessionId);
+  async handle({ body, set, sessionId }: RevokeCurrentControllerContext) {
+    try {
+      const parsedBody = revokeCurrentSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Session revoked",
-        description: "Your current session has been revoked successfully.",
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      await this.service.execute(sessionId);
+
+      return successResponse(
+        { set },
+        {
+          status: 200,
+          title: "Session revoked",
+          description: "Your current session has been revoked successfully.",
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

@@ -4,6 +4,7 @@ import { accountsRouter } from "./modules/accounts/router";
 import { sessionsRouter } from "./modules/sessions/router";
 import { departmentsRouter } from "./modules/departments/router";
 import { documentsRouter } from "./modules/documents/router";
+import { logsRouter } from "./modules/logs/router";
 
 export const router = new Elysia()
   .use(
@@ -24,4 +25,5 @@ export const router = new Elysia()
   .use(accountsRouter)
   .use(sessionsRouter)
   .use(departmentsRouter)
-  .use(documentsRouter);
+  .use(documentsRouter)
+  .use(logsRouter);

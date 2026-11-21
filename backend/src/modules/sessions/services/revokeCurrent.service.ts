@@ -1,20 +1,12 @@
-import {
-  findSessionById,
-  revokeSessionRecord,
-} from "../repositories/revokeCurrent.repository";
+import type { RevokeCurrentRepositoryPort } from "../repositories/revokeCurrent.repository";
 
-export async function revokeCurrent(sessionId: string) {
-  const session = await findSessionById(sessionId);
+export class RevokeCurrentService {
+  constructor(private readonly repository: RevokeCurrentRepositoryPort) {}
 
-  if (!session) {
-    throw new Error("Session not found or already revoked.");
+  async execute(sessionId: string) {
+    const session = await this.repository.findById(sessionId);
+    if (!session) throw new Error("Session not found or already revoked.");
+    if (session.revokedAt) throw new Error("Session is already revoked.");
+    return this.repository.revoke(sessionId);
   }
-
-  if (session.revokedAt) {
-    throw new Error("Session is already revoked.");
-  }
-
-  const revokedSession = await revokeSessionRecord(sessionId);
-
-  return revokedSession;
 }

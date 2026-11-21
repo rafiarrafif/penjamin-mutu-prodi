@@ -1,33 +1,45 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { createDataCategory } from "../services/createDataCategory.service";
 import { createDataCategorySchema } from "../schemas/createDataCategory.schema";
+import type { CreateDataCategoryService } from "../services/createDataCategory.service";
 
 interface CreateDataCategoryControllerContext {
   body: unknown;
   set: { status?: number | string };
+  accountId: string;
+  sessionId: string;
 }
 
-export async function createDataCategoryController({
-  body,
-  set,
-}: CreateDataCategoryControllerContext) {
-  try {
-    const parsedBody = createDataCategorySchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class CreateDataCategoryController {
+  constructor(private readonly service: CreateDataCategoryService) {}
 
-    const category = await createDataCategory(parsedBody.data);
+  async handle({
+    body,
+    set,
+    accountId,
+    sessionId,
+  }: CreateDataCategoryControllerContext) {
+    try {
+      const parsedBody = createDataCategorySchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 201,
-        title: "Category created",
-        description: "The data category was added successfully.",
-        data: [category],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const category = await this.service.execute(
+        parsedBody.data,
+        accountId,
+        sessionId,
+      );
+
+      return successResponse(
+        { set },
+        {
+          status: 201,
+          title: "Category created",
+          description: "The data category was added successfully.",
+          data: [category],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

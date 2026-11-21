@@ -1,47 +1,38 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { approvalProvision } from "../services/approvalProvision.service";
 import { approvalProvisionSchema } from "../schemas/approvalProvision.schema";
+import type { ApprovalProvisionService } from "../services/approvalProvision.service";
 
 interface ApprovalProvisionControllerContext {
   body: unknown;
   set: { status?: number | string };
 }
 
-export async function approvalProvisionController({
-  body,
-  set,
-}: ApprovalProvisionControllerContext) {
-  try {
-    const parsedBody = approvalProvisionSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class ApprovalProvisionController {
+  constructor(private readonly service: ApprovalProvisionService) {}
 
-    const result = await approvalProvision(parsedBody.data);
+  async handle({ body, set }: ApprovalProvisionControllerContext) {
+    try {
+      const parsedBody = approvalProvisionSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    if (result.alreadyVerified) {
+      const result = await this.service.execute(parsedBody.data);
+
       return successResponse(
         { set },
         {
-          status: 201,
-          title: "Account already verified",
-          description:
-            "The account was already verified and no changes were made.",
+          status: result.alreadyVerified ? 201 : 200,
+          title: result.alreadyVerified
+            ? "Account already verified"
+            : "Account approved",
+          description: result.alreadyVerified
+            ? "The account was already verified and no changes were made."
+            : "The account has been successfully verified and activated.",
           data: [result.account],
         },
       );
+    } catch (error) {
+      return handleError(error, { set });
     }
-
-    return successResponse(
-      { set },
-      {
-        status: 200,
-        title: "Account approved",
-        description:
-          "The account has been successfully verified and activated.",
-        data: [result.account],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
   }
 }

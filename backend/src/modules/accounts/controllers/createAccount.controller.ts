@@ -1,7 +1,7 @@
 import { handleError } from "../../../helper/errorHandler";
 import { successResponse } from "../../../helper/response";
-import { createAccount } from "../services/createAccount.service";
 import { createAccountSchema } from "../schemas/createAccount.schema";
+import type { CreateAccountService } from "../services/createAccount.service";
 
 interface CreateAccountControllerContext {
   body: unknown;
@@ -9,27 +9,27 @@ interface CreateAccountControllerContext {
   accountRole: string;
 }
 
-export async function createAccountController({
-  body,
-  set,
-  accountRole,
-}: CreateAccountControllerContext) {
-  try {
-    const parsedBody = createAccountSchema.safeParse(body);
-    if (!parsedBody.success) return handleError(parsedBody.error, { set });
+export class CreateAccountController {
+  constructor(private readonly service: CreateAccountService) {}
 
-    const account = await createAccount(parsedBody.data, accountRole);
+  async handle({ body, set, accountRole }: CreateAccountControllerContext) {
+    try {
+      const parsedBody = createAccountSchema.safeParse(body);
+      if (!parsedBody.success) return handleError(parsedBody.error, { set });
 
-    return successResponse(
-      { set },
-      {
-        status: 201,
-        title: "Account created",
-        description: "The account was added to the system successfully.",
-        data: [account],
-      },
-    );
-  } catch (error) {
-    return handleError(error, { set });
+      const account = await this.service.execute(parsedBody.data, accountRole);
+
+      return successResponse(
+        { set },
+        {
+          status: 201,
+          title: "Account created",
+          description: "The account was added to the system successfully.",
+          data: [account],
+        },
+      );
+    } catch (error) {
+      return handleError(error, { set });
+    }
   }
 }

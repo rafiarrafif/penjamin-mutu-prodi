@@ -47,3 +47,4 @@ AGENT_TASKS*
 .agents
 .env
 *.env
+PRD.md

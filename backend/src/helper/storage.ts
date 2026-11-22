@@ -68,6 +68,35 @@ export async function writeStoredFile(
   return filename;
 }
 
+export async function deleteStoredFile(filename: string): Promise<boolean> {
+  if (
+    !filename ||
+    basename(filename) !== filename ||
+    filename.includes("/") ||
+    filename.includes("\\")
+  ) {
+    return false;
+  }
+
+  const filePath = resolve(storageAppDirectory, filename);
+  if (
+    !filePath.startsWith(
+      `${storageAppDirectory}${process.platform === "win32" ? "\\" : "/"}`,
+    )
+  ) {
+    return false;
+  }
+
+  try {
+    if (!existsSync(filePath)) return false;
+    const { unlink } = await import("node:fs/promises");
+    await unlink(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function readStoredFile(filename: string): Blob | null {
   if (
     !filename ||

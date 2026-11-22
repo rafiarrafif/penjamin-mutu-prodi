@@ -23,7 +23,7 @@ model DataCategory {
 }
 
 model DataRequirement {
-  dataCategoryId String          @map("data_category_id") @db.UniqueIdentifier
+  dataCategoryId String          @unique @map("data_category_id") @db.UniqueIdentifier
   id             String          @id @db.UniqueIdentifier
   frequencyCode  String          @map("frequency_code") @db.VarChar(32)
   name           String          @db.VarChar(500)
@@ -32,35 +32,26 @@ model DataRequirement {
   deletedAt      DateTime?       @map("deleted_at") @db.DateTime2
   category       DataCategory    @relation(fields: [dataCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   frequency      Frequency       @relation(fields: [frequencyCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
-  entries        DataEntry[]
+  submissions    DataSubmission[]
   departmentPics DepartmentPic[]
 
   @@map("data_requirements")
 }
 
 model DataEntry {
-  dataRequirementId String           @map("data_requirement_id") @db.UniqueIdentifier
-  id                String           @id @db.UniqueIdentifier
-  periodId          String           @map("period_id") @db.UniqueIdentifier
-  filename          String           @db.VarChar(255)
-  filetype          String           @db.VarChar(12)
-  fileSize          Int              @map("file_size")
-  isSecret          Boolean          @map("is_secret") @db.Bit
-  requirement       DataRequirement  @relation(fields: [dataRequirementId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  period            Period           @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  fileUpload        FileUpload?
-  submission        Submission?
-  scoringResults    ScoringResult[]
+  id            String        @id @db.UniqueIdentifier
+  submissionId  String        @unique @map("submission_id") @db.UniqueIdentifier
+  fileName      String        @map("file_name") @db.VarChar(255)
+  fileType      String        @map("file_type") @db.VarChar(12)
+  fileSizeBytes BigInt        @map("file_size_bytes") @db.BigInt
+  storagePath   String        @map("storage_path") @db.VarChar(300)
+  isSecret      Boolean       @map("is_secret") @db.Bit
+  createdAt     DateTime      @map("created_at") @db.DateTime2
+  updatedAt     DateTime      @map("updated_at") @db.DateTime2
+  deletedAt     DateTime?     @map("deleted_at") @db.DateTime2
+  submission    DataSubmission @relation(fields: [submissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("data_entries")
-}
-
-model FileUpload {
-  dataEntryId String    @id @map("data_entry_id") @db.UniqueIdentifier
-  blob        String    @db.VarChar(500)
-  dataEntry   DataEntry @relation(fields: [dataEntryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@map("file_uploads")
 }
 
 model Department {
@@ -142,6 +133,8 @@ model DepartmentHistory {
   endDate           DateTime?  @map("end_date") @db.Date
   accountIdAssigner String     @map("account_id_assigner") @db.UniqueIdentifier
   createdAt         DateTime   @map("created_at") @db.DateTime2
+  updatedAt         DateTime   @map("updated_at") @db.DateTime2
+  deletedAt         DateTime?  @map("deleted_at") @db.DateTime2
   account           Account    @relation("DepartmentHistoryAccount", fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   assigner          Account    @relation("DepartmentHistoryAssigner", fields: [accountIdAssigner], references: [id], onDelete: NoAction, onUpdate: NoAction)
   department        Department @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -154,6 +147,8 @@ model DepartmentPic {
   dataRequirementId String          @map("data_requirement_id") @db.UniqueIdentifier
   accountIdAssigner String          @map("account_id_assigner") @db.UniqueIdentifier
   createdAt         DateTime        @map("created_at") @db.DateTime2
+  updatedAt         DateTime        @map("updated_at") @db.DateTime2
+  deletedAt         DateTime?       @map("deleted_at") @db.DateTime2
   department        Department      @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   requirement       DataRequirement @relation(fields: [dataRequirementId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   assigner          Account         @relation("DepartmentPicAssigner", fields: [accountIdAssigner], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -162,17 +157,22 @@ model DepartmentPic {
   @@map("department_pics")
 }
 
-model Submission {
-  dataEntryId     String    @id @map("data_entry_id") @db.UniqueIdentifier
-  status          String    @default("hold") @db.VarChar(8)
-  reviewerMessage String?   @map("reviewer_message") @db.VarChar(255)
-  reviewedAt      DateTime? @map("reviewed_at") @db.DateTime2
-  createdAt       DateTime  @map("created_at") @db.DateTime2
-  updatedAt       DateTime  @map("updated_at") @db.DateTime2
-  deletedAt       DateTime? @map("deleted_at") @db.DateTime2
-  dataEntry       DataEntry @relation(fields: [dataEntryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model DataSubmission {
+  id                String          @id @db.UniqueIdentifier
+  dataRequirementId String          @map("data_requirement_id") @db.UniqueIdentifier
+  periodId          String          @map("period_id") @db.UniqueIdentifier
+  status            String          @default("hold") @db.VarChar(8)
+  reviewerMessage   String?         @map("reviewer_message") @db.VarChar(255)
+  reviewedAt        DateTime?       @map("reviewed_at") @db.DateTime2
+  createdAt         DateTime        @map("created_at") @db.DateTime2
+  updatedAt         DateTime        @map("updated_at") @db.DateTime2
+  deletedAt         DateTime?       @map("deleted_at") @db.DateTime2
+  requirement       DataRequirement @relation(fields: [dataRequirementId], references: [dataCategoryId], onDelete: NoAction, onUpdate: NoAction)
+  period            Period          @relation(fields: [periodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dataEntry         DataEntry?
+  scoringResults    ScoringResult[]
 
-  @@map("submissions")
+  @@map("data_submissions")
 }
 
 model ScoringMethod {
@@ -204,20 +204,26 @@ model ScoringFormula {
 }
 
 model ScoringResult {
-  dataEntryId     String        @map("data_entry_id") @db.UniqueIdentifier
-  scoringMethodId String        @map("scoring_method_id") @db.UniqueIdentifier
-  proofLink       String        @map("proof_link") @db.VarChar(255)
-  period          String        @db.VarChar(255)
-  dataEntry       DataEntry     @relation(fields: [dataEntryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  scoringMethod   ScoringMethod @relation(fields: [scoringMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dataSubmissionId String        @map("data_submission_id") @db.UniqueIdentifier
+  scoringMethodId  String        @map("scoring_method_id") @db.UniqueIdentifier
+  proofLink        String        @map("proof_link") @db.VarChar(255)
+  period           String        @db.VarChar(255)
+  createdAt        DateTime      @map("created_at") @db.DateTime2
+  updatedAt        DateTime      @map("updated_at") @db.DateTime2
+  deletedAt        DateTime?     @map("deleted_at") @db.DateTime2
+  dataSubmission   DataSubmission @relation(fields: [dataSubmissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  scoringMethod    ScoringMethod  @relation(fields: [scoringMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([dataEntryId, scoringMethodId])
+  @@id([dataSubmissionId, scoringMethodId])
   @@map("scoring_result")
 }
 
 model Frequency {
   code         String            @id @db.VarChar(32)
   label        String            @db.VarChar(225)
+  createdAt    DateTime          @map("created_at") @db.DateTime2
+  updatedAt    DateTime          @map("updated_at") @db.DateTime2
+  deletedAt    DateTime?         @map("deleted_at") @db.DateTime2
   requirements DataRequirement[]
   periods      Period[]
 
@@ -233,8 +239,11 @@ model Period {
   semester      Int?        @db.SmallInt
   startDate     DateTime    @map("start_date") @db.Date
   endDate       DateTime    @map("end_date") @db.Date
+  createdAt     DateTime    @map("created_at") @db.DateTime2
+  updatedAt     DateTime    @map("updated_at") @db.DateTime2
+  deletedAt     DateTime?   @map("deleted_at") @db.DateTime2
   frequency     Frequency   @relation(fields: [frequencyCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
-  entries       DataEntry[]
+  submissions   DataSubmission[]
 
   @@map("periods")
 }

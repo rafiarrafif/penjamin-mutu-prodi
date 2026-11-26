@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIMPATI — Design Reference & Patokan UI (Penjaminan Mutu Prodi)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-canvas: #F5FAFE;
+      --bg-surface: #FFFFFF;
+      --bg-surface-tinted: #EDF6FD;
+      --bg-subtle: #ECEEEF;
+      --bg-table-head: #EAECEF;
+      --bg-nav-active: #E8E9EC;
+
+      --border-default: #E4E7EC;
+      --border-strong: #D0D5DD;
+      --border-tinted: #D7EAF8;
+
+      --text-primary: #18181B;
+      --text-secondary: #3F3F46;
+      --text-muted: #667085;
+      --text-subtle: #98A2B3;
+
+      --brand-deep: #005C7C;
+      --brand-deep-hover: #004B65;
+      --brand-action: #4E9AC7;
+      --brand-action-hover: #3D88B5;
+
+      --bg-danger-soft: #FEE8EA;
+      --border-danger-soft: #F5C2C7;
+      --text-danger: #B42318;
+
+      --bg-success-soft: #ECFDF3;
+      --text-success: #067647;
+
+      --bg-warning-soft: #FFFAEB;
+      --text-warning: #B54708;
+
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: var(--font-sans); background: #E9EEF3; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+    .tabular { font-variant-numeric: tabular-nums; }
+    .mono { font-family: var(--font-mono); }
+
+    /* Benchmark Switcher Bar */
+    .ref-toolbar {
+      position: sticky; top: 0; z-index: 100;
+      background: #111827; color: #F9FAFB;
+      padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid #1F2937;
+    }
+    .ref-toolbar-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .ref-toolbar-badge { font-size: 11px; background: #005C7C; color: #fff; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+    .ref-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ref-tab {
+      background: #1F2937; color: #D1D5DB; border: 1px solid #374151;
+      padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer;
+      transition: all .15s ease;
+    }
+    .ref-tab:hover { background: #374151; color: #fff; }
+    .ref-tab.active { background: #4E9AC7; color: #fff; border-color: #4E9AC7; }
+
+    .stage { max-width: 1380px; margin: 24px auto; padding: 0 16px 48px; }
+    .screen-frame {
+      background: var(--bg-canvas); border: 1px solid #CFD8E3; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 14px 40px -16px rgba(15, 23, 42, 0.16);
+      display: none;
+    }
+    .screen-frame.active { display: block; }
+
+    /* Shared UI Primitives */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 34px; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer; text-decoration: none; font-family: inherit;
+    }
+    .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; font-weight: 500; border-radius: 5px; }
+    .btn-lg { height: 40px; padding: 0 20px; font-size: 13.5px; }
+    .btn-action { background: var(--brand-action); color: #fff; }
+    .btn-action:hover { background: var(--brand-action-hover); }
+    .btn-deep { background: var(--brand-deep); color: #fff; }
+    .btn-deep:hover { background: var(--brand-deep-hover); }
+    .btn-outline { background: #fff; border-color: var(--border-strong); color: var(--text-secondary); }
+    .btn-outline:hover { background: #F9FAFB; }
+    .btn-ghost { background: transparent; color: var(--text-muted); }
+    .btn-ghost:hover { background: #ECEEEF; color: var(--text-primary); }
+
+    .card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 8px; }
+    .card-pad { padding: 18px 20px; }
+    .banner-info {
+      background: var(--bg-subtle); border-radius: 6px; padding: 10px 14px;
+      font-size: 12.5px; line-height: 1.45; color: var(--text-secondary);
+    }
+    .banner-info strong { color: var(--text-primary); display: block; font-size: 12px; margin-bottom: 2px; }
+    .banner-danger {
+      background: var(--bg-danger-soft); border: 1px solid var(--border-danger-soft);
+      border-radius: 6px; padding: 9px 12px; font-size: 12.5px; color: var(--text-danger);
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .input, .select, .textarea {
+      width: 100%; border: 1px solid var(--border-strong); border-radius: 6px;
+      background: #fff; color: var(--text-primary); font-family: inherit; font-size: 13px;
+      padding: 0 11px; height: 35px; outline: none;
+    }
+    .textarea { height: auto; min-height: 76px; padding: 9px 11px; resize: vertical; }
+    .input:focus, .select:focus, .textarea:focus { border-color: var(--brand-action); box-shadow: 0 0 0 3px rgba(78, 154, 199, 0.16); }
+    .input-locked { background: var(--bg-table-head); color: var(--text-muted); border-color: var(--border-default); }
+    .helper { font-size: 11.5px; color: var(--text-muted); }
+
+    .badge {
+      display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px;
+      font-size: 11.5px; font-weight: 600; border: 1px solid transparent;
+    }
+    .badge-neutral { background: var(--bg-subtle); color: var(--text-secondary); }
+    .badge-success { background: var(--bg-success-soft); color: var(--text-success); }
+    .badge-warning { background: var(--bg-warning-soft); color: var(--text-warning); }
+    .badge-danger { background: var(--bg-danger-soft); color: var(--text-danger); }
+
+    /* Brand Logo */
+    .brand-lockup { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--text-primary); }
+    .brand-icon {
+      width: 28px; height: 28px; border-radius: 6px; background: var(--brand-deep);
+      display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px;
+    }
+    .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+    .brand-sub { font-size: 10.5px; color: var(--text-muted); }
+
+    /* ==================== SHELL A: LANDING (Tile 19) ==================== */
+    .pub-nav {
+      height: 56px; background: #fff; border-bottom: 1px solid var(--border-default);
+      padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .pub-links { display: flex; align-items: center; gap: 22px; font-size: 13px; color: var(--text-secondary); }
+    .pub-links a { color: inherit; text-decoration: none; font-weight: 500; }
+    .hero {
+      background: var(--bg-canvas); padding: 64px 40px 72px;
+      display: grid; grid-template-columns: 1.15fr 0.85fr; align-items: center; gap: 40px;
+      max-width: 1120px; margin: 0 auto;
+    }
+    .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--brand-deep); text-transform: uppercase; margin-bottom: 12px; }
+    .hero-title { font-size: 42px; line-height: 1.1; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 14px; color: var(--text-primary); }
+    .hero-sub { font-size: 14.5px; line-height: 1.6; color: var(--text-muted); max-width: 460px; margin: 0 0 24px; }
+    .hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .hero-link { font-size: 12.5px; color: var(--brand-deep); text-decoration: none; font-weight: 500; }
+    .features-band { background: #fff; border-top: 1px solid var(--border-default); padding: 40px; }
+    .features-inner { max-width: 1040px; margin: 0 auto; }
+    .features-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature-card {
+      background: var(--bg-surface-tinted); border: 1px solid var(--border-tinted);
+      border-radius: 8px; padding: 20px;
+    }
+    .feature-icon {
+      width: 28px; height: 28px; border-radius: 6px; background: #fff; border: 1px solid var(--border-tinted);
+      display: grid; place-items: center; color: var(--brand-deep); margin-bottom: 12px; font-size: 13px; font-weight: 700;
+    }
+    .feature-title { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+    .feature-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin: 0; }
+    .pub-footer {
+      background: #fff; border-top: 1px solid var(--border-default);
+      padding: 16px 40px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);
+    }
+
+    /* ==================== SHELL B: LOGIN (Tile 1) ==================== */
+    .auth-stage {
+      min-height: 620px; background: var(--bg-canvas); padding: 48px 32px;
+      display: grid; place-items: center;
+    }
+    .auth-grid {
+      width: 100%; max-width: 860px; display: grid; grid-template-columns: 1fr 370px; gap: 48px; align-items: center;
+    }
+    .auth-card {
+      background: #fff; border: 1px solid var(--border-default); border-radius: 10px;
+      padding: 24px; box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08);
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--text-subtle); font-size: 11px; font-weight: 600; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border-default); }
+
+    /* ==================== SHELL C: WORKSPACE APP SHELL ==================== */
+    .app-shell { display: grid; grid-template-columns: 244px 1fr; min-height: 760px; }
+    .sidebar {
+      background: #fff; border-right: 1px solid var(--border-default);
+      display: flex; flex-direction: column; padding: 14px 12px; gap: 14px;
+    }
+    .sidebar-user-card {
+      background: var(--bg-surface-tinted); border: 1px solid var(--border-tinted);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .nav-group-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-subtle); text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 10px;
+      border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      text-decoration: none; cursor: pointer;
+    }
+    .nav-item:hover { background: #F4F6F8; }
+    .nav-item.active { background: var(--bg-nav-active); color: var(--text-primary); font-weight: 600; }
+    .sidebar-foot { margin-top: auto; border-top: 1px solid var(--border-default); padding-top: 12px; font-size: 11.5px; color: var(--text-muted); }
+
+    .main-col { display: flex; flex-direction: column; min-width: 0; background: var(--bg-canvas); }
+    .topbar {
+      height: 52px; background: #fff; border-bottom: 1px solid var(--border-default);
+      padding: 0 26px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .breadcrumb { font-size: 12.5px; color: var(--text-muted); }
+    .breadcrumb strong { color: var(--text-primary); font-weight: 600; }
+    .content { padding: 20px 26px 28px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+    .back-link { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+    .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .page-title { font-size: 21px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 3px; }
+    .page-sub { font-size: 13px; color: var(--text-muted); margin: 0; }
+    .sub-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+
+    /* Split Workspace Grid */
+    .split-grid { display: grid; grid-template-columns: minmax(0, 1fr) 332px; gap: 16px; align-items: start; }
+
+    /* Table */
+    .table-wrap { background: #fff; border: 1px solid var(--border-default); border-radius: 8px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    thead th {
+      background: var(--bg-table-head); color: #475467; font-size: 11.5px; font-weight: 600;
+      padding: 9px 14px; border-bottom: 1px solid var(--border-default);
+    }
+    tbody td {
+      padding: 10px 14px; font-size: 13px; color: var(--text-secondary);
+      border-bottom: 1px solid #F0F2F5; vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #F9FCFE; }
+
+    /* Pagination */
+    .pagination-bar { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); padding: 2px 0; }
+    .page-btns { display: flex; align-items: center; gap: 6px; }
+    .page-num {
+      width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center;
+      font-size: 12px; font-weight: 600; border: 1px solid var(--border-default); background: #fff; color: var(--text-secondary);
+    }
+    .page-num.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+
+    /* KPI */
+    .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi-grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .kpi-card { background: #fff; border: 1px solid var(--border-default); border-radius: 8px; padding: 13px 15px; }
+    .kpi-label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; }
+    .kpi-val { font-size: 20px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.015em; }
+    .kpi-big { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+    .progress-track { height: 6px; background: var(--border-default); border-radius: 999px; overflow: hidden; margin: 10px 0 6px; }
+    .progress-fill { height: 100%; background: var(--text-primary); border-radius: 999px; }
+
+    .toolbar { display: flex; gap: 8px; align-items: center; }
+    .dropzone {
+      border: 1.5px dashed var(--border-strong); border-radius: 8px; background: #FAFBFD;
+      padding: 22px; text-align: center; font-size: 12.5px; color: var(--text-muted);
+    }
+    .preview-empty {
+      border: 1px solid var(--border-default); border-radius: 6px; background: #FAFBFD;
+      height: 150px; display: grid; place-items: center; text-align: center; color: var(--text-muted); font-size: 12.5px;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .auth-grid, .split-grid, .app-shell, .features-grid, .kpi-grid-4, .kpi-grid-6 {
+        grid-template-columns: 1fr;
+      }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border-default); }
+    }
+  </style>
+</head>
+<body>
+  <div class="ref-toolbar">
+    <div class="ref-toolbar-title">
+      <span>SIMPATI — Patokan Desain UI</span>
+      <span class="ref-toolbar-badge">19-Screen Visual Reference</span>
+    </div>
+    <div class="ref-tabs">
+      <button class="ref-tab active" onclick="showScreen('landing', this)">Landing (Tile 19)</button>
+      <button class="ref-tab" onclick="showScreen('login', this)">Login (Tile 1)</button>
+      <button class="ref-tab" onclick="showScreen('split', this)">Table + Form (Tiles 3–7)</button>
+      <button class="ref-tab" onclick="showScreen('kpi', this)">KPI + Table (Tiles 9, 15, 16)</button>
+      <button class="ref-tab" onclick="showScreen('review', this)">Detail & Review (Tiles 10, 12, 14)</button>
+      <button class="ref-tab" onclick="showScreen('tokens', this)">Tokens & Components</button>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- 1. LANDING PAGE (Tile 19) -->
+    <section id="screen-landing" class="screen-frame active">
+      <header class="pub-nav">
+        <a href="#" class="brand-lockup">
+          <div class="brand-icon">S</div>
+          <div>
+            <div class="brand-name">SIMPATI</div>
+            <div class="brand-sub">Penjaminan Mutu Prodi</div>
+          </div>
+        </a>
+        <nav class="pub-links">
+          <a href="#">Beranda</a>
+          <a href="#">Panduan Mutu</a>
+          <a href="#">Masuk</a>
+        </nav>
+      </header>
+
+      <div style="background: var(--bg-canvas);">
+        <div class="hero">
+          <div>
+            <div class="hero-eyebrow">Sistem Penjaminan Mutu Program Studi</div>
+            <h1 class="hero-title">Mutu terjaga.<br />Bukti tertata.</h1>
+            <p class="hero-sub">Kelola kebutuhan dokumen mutu, unggah bukti berkala, verifikasi pengajuan dosen, dan pantau ketercapaian indikator prodi dalam satu portal terpadu.</p>
+            <div class="hero-actions">
+              <button class="btn btn-deep btn-lg">Masuk ke Portal Mutu</button>
+              <a href="#" class="hero-link">Lihat alur kerja verifikasi &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Geometric Flat Illustration matching Tile 19 -->
+          <div style="display:flex; justify-content:center;">
+            <svg width="280" height="210" viewBox="0 0 280 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="145" cy="105" r="88" fill="#E6F2FA" stroke="#D1E6F5" stroke-dasharray="4 4" />
+              <!-- Document checklist card -->
+              <rect x="64" y="34" width="114" height="136" rx="8" fill="#FFFFFF" stroke="#D5E3EE" stroke-width="1.5" />
+              <rect x="98" y="27" width="46" height="12" rx="4" fill="#005C7C" />
+              <rect x="80" y="52" width="54" height="6" rx="3" fill="#005C7C" />
+              <circle cx="86" cy="80" r="6" fill="#EDF6FD" stroke="#4E9AC7" />
+              <rect x="98" y="77" width="62" height="5" rx="2.5" fill="#18181B" />
+              <circle cx="86" cy="106" r="6" fill="#EDF6FD" stroke="#4E9AC7" />
+              <rect x="98" y="103" width="50" height="5" rx="2.5" fill="#98A2B3" />
+              <circle cx="86" cy="132" r="6" fill="#EDF6FD" stroke="#4E9AC7" />
+              <rect x="98" y="129" width="58" height="5" rx="2.5" fill="#18181B" />
+              <!-- Mini bar chart card -->
+              <rect x="172" y="48" width="58" height="44" rx="6" fill="#FFFFFF" stroke="#D5E3EE" />
+              <rect x="184" y="72" width="7" height="11" rx="1.5" fill="#7CC0E6" />
+              <rect x="196" y="65" width="7" height="18" rx="1.5" fill="#4E9AC7" />
+              <rect x="208" y="58" width="7" height="25" rx="1.5" fill="#005C7C" />
+              <!-- Shield with check -->
+              <path d="M188 108L216 119V141C216 159 204 174 188 180C172 174 160 159 160 141V119L188 108Z" fill="#005C7C" />
+              <path d="M178 143L185 150L199 135" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <section class="features-band">
+        <div class="features-inner">
+          <div class="features-head">
+            <h2 style="font-size:15px; font-weight:600; margin:0;">Cakupan Sistem Penjaminan Mutu</h2>
+            <a href="#" class="hero-link">Dokumentasi &rarr;</a>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">01</div>
+              <h3 class="feature-title">Inventaris Dokumen & PIC</h3>
+              <p class="feature-desc">Pemetaan kategori data, kebutuhan bukti berkala, dan penanggung jawab tiap unit prodi.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">02</div>
+              <h3 class="feature-title">Verifikasi Berjenjang</h3>
+              <p class="feature-desc">Alur tinjauan verifikator dengan status Hold, Accept, Revision, dan Reject beserta catatan reviewer.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">03</div>
+              <h3 class="feature-title">Skoring & Audit Trail</h3>
+              <p class="feature-desc">Perhitungan ketercapaian mutu berbasis formula dan pencatatan log perubahan yang akuntabel.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="pub-footer">
+        <span>&copy; 2026 SIMPATI — Sistem Penjaminan Mutu Program Studi</span>
+        <span>v1.0 &middot; Academic Quality Assurance</span>
+      </footer>
+    </section>
+
+    <!-- 2. LOGIN SCREEN (Tile 1) -->
+    <section id="screen-login" class="screen-frame">
+      <header class="pub-nav">
+        <a href="#" class="brand-lockup">
+          <div class="brand-icon">S</div>
+          <div>
+            <div class="brand-name">SIMPATI</div>
+            <div class="brand-sub">Penjaminan Mutu Prodi</div>
+          </div>
+        </a>
+        <span style="font-size:12px; color:var(--text-muted);">Portal Autentikasi</span>
+      </header>
+
+      <div class="auth-stage">
+        <div class="auth-grid">
+          <div>
+            <h1 style="font-size:28px; line-height:1.2; font-weight:700; letter-spacing:-0.02em; margin:0 0 12px;">
+              Sistem Penjaminan Mutu<br />Program Studi
+            </h1>
+            <p style="font-size:13.5px; line-height:1.6; color:var(--text-muted); margin:0; max-width:380px;">
+              Masuk menggunakan akun institusi terdaftar untuk mengelola dokumen mutu, melakukan verifikasi, atau menyetujui provisi akun.
+            </p>
+          </div>
+
+          <div class="auth-card">
+            <div>
+              <div style="font-size:16px; font-weight:700; margin-bottom:2px;">Masuk ke Akun</div>
+              <div style="font-size:12px; color:var(--text-muted);">Gunakan akun Google institusi atau email terdaftar</div>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Email Institusi</label>
+              <input class="input" type="email" value="dosen@kampus.ac.id" />
+            </div>
+            <div class="field">
+              <label class="field-label">Kata Sandi</label>
+              <input class="input" type="password" value="••••••••••" />
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted);">
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" checked /> Ingat sesi</label>
+              <a href="#" style="color:var(--brand-deep); text-decoration:none;">Butuh bantuan?</a>
+            </div>
+
+            <div class="banner-danger">
+              Akun belum terverifikasi oleh Direktur. Hubungi pengelola untuk persetujuan provisi.
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+              <button class="btn btn-action">Masuk</button>
+            </div>
+
+            <div class="divider">ATAU</div>
+
+            <button class="btn btn-action" style="width:100%;">
+              Masuk dengan Google OAuth
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="pub-footer">
+        <span>Panduan Login &amp; Provisi Akun</span>
+        <span>&copy; 2026 SIMPATI</span>
+      </footer>
+    </section>
+
+    <!-- 3. SPLIT WORKSPACE: TABLE + RIGHT FORM/INSPECTOR (Tiles 3-7) -->
+    <section id="screen-split" class="screen-frame">
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand-lockup" style="padding: 2px 6px;">
+            <div class="brand-icon">S</div>
+            <div>
+              <div class="brand-name">SIMPATI</div>
+              <div class="brand-sub">Penjaminan Mutu</div>
+            </div>
+          </div>
+
+          <div class="sidebar-user-card">
+            <div style="font-size:12.5px; font-weight:600;">Dr. Razan Pratama</div>
+            <div style="font-size:11px; color:var(--text-muted);">admin@prodi.ac.id</div>
+            <span class="badge badge-neutral" style="margin-top:6px;">Role: Admin</span>
+          </div>
+
+          <div>
+            <div class="nav-group-label">Utama</div>
+            <a class="nav-item">Dashboard</a>
+            <a class="nav-item">Profil Saya</a>
+          </div>
+          <div>
+            <div class="nav-group-label">Manajemen</div>
+            <a class="nav-item active">Kategori Data</a>
+            <a class="nav-item">Departemen</a>
+            <a class="nav-item">Akun Pengguna</a>
+            <a class="nav-item">Kebutuhan Bukti</a>
+          </div>
+          <div>
+            <div class="nav-group-label">Direktur &amp; Audit</div>
+            <a class="nav-item">Provisi Akun</a>
+            <a class="nav-item">Log Perubahan</a>
+          </div>
+
+          <div class="sidebar-foot">
+            <div>Sesi aktif &middot; Desktop</div>
+            <div style="margin-top:2px; color:var(--text-subtle);">SIMPATI v1.0</div>
+          </div>
+        </aside>
+
+        <div class="main-col">
+          <header class="topbar">
+            <div class="breadcrumb">Dashboard / Manajemen / <strong>Kategori Data</strong></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:12.5px; color:var(--text-secondary);">Dr. Razan Pratama</span>
+              <button class="btn btn-outline btn-sm">Keluar</button>
+            </div>
+          </header>
+
+          <main class="content">
+            <a href="#" class="back-link">&larr; Kembali ke Dashboard</a>
+            <div class="page-head">
+              <div>
+                <h1 class="page-title">Manajemen Kategori Data</h1>
+                <p class="page-sub">Kelola kategori dokumen penjaminan mutu beserta slug dan keterkaitannya dengan kebutuhan bukti.</p>
+              </div>
+              <button class="btn btn-action">+ Tambah Kategori</button>
+            </div>
+
+            <div class="sub-row">
+              <span>Daftar Kategori Aktif</span>
+              <span>Total: 6 kategori terdaftar</span>
+            </div>
+
+            <div class="banner-info">
+              <strong>Ketentuan Penamaan Kategori</strong>
+              Nama kategori maksimal 250 karakter. Slug URL dibuat otomatis dari nama kategori dan dicatat ke dalam audit log sistem.
+            </div>
+
+            <div class="split-grid">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div class="toolbar">
+                  <input class="input" placeholder="Cari nama atau slug kategori..." style="flex:1;" />
+                  <select class="select" style="width:150px;"><option>Semua Status</option></select>
+                </div>
+
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style="width:72px;">Kode</th>
+                        <th>Nama Kategori</th>
+                        <th>Slug</th>
+                        <th>Kebutuhan</th>
+                        <th style="width:90px; text-align:right;">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="mono" style="font-size:12px;">CAT-01</td>
+                        <td><strong>Kurikulum &amp; RPS</strong></td>
+                        <td class="mono" style="font-size:12px; color:var(--text-muted);">kurikulum-rps</td>
+                        <td class="tabular">12 item</td>
+                        <td style="text-align:right;"><button class="btn btn-outline btn-sm">Detail</button></td>
+                      </tr>
+                      <tr>
+                        <td class="mono" style="font-size:12px;">CAT-02</td>
+                        <td><strong>Penelitian &amp; Pengabdian</strong></td>
+                        <td class="mono" style="font-size:12px; color:var(--text-muted);">penelitian-pengabdian</td>
+                        <td class="tabular">8 item</td>
+                        <td style="text-align:right;"><button class="btn btn-outline btn-sm">Detail</button></td>
+                      </tr>
+                      <tr>
+                        <td class="mono" style="font-size:12px;">CAT-03</td>
+                        <td><strong>Sumber Daya Manusia</strong></td>
+                        <td class="mono" style="font-size:12px; color:var(--text-muted);">sumber-daya-manusia</td>
+                        <td class="tabular">9 item</td>
+                        <td style="text-align:right;"><button class="btn btn-outline btn-sm">Detail</button></td>
+                      </tr>
+                      <tr>
+                        <td class="mono" style="font-size:12px;">CAT-04</td>
+                        <td><strong>Sarana &amp; Prasarana</strong></td>
+                        <td class="mono" style="font-size:12px; color:var(--text-muted);">sarana-prasarana</td>
+                        <td class="tabular">5 item</td>
+                        <td style="text-align:right;"><button class="btn btn-outline btn-sm">Detail</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="pagination-bar">
+                  <span>Menampilkan 1–4 dari 6 data</span>
+                  <div class="page-btns">
+                    <button class="btn btn-outline btn-sm">Previous</button>
+                    <span class="page-num active">1</span>
+                    <span class="page-num">2</span>
+                    <button class="btn btn-outline btn-sm">Next</button>
+                  </div>
+                </div>
+
+                <div class="card card-pad">
+                  <div style="font-size:13.5px; font-weight:600; margin-bottom:6px;">Ringkasan Kebijakan Kategori</div>
+                  <div style="font-size:12.5px; color:var(--text-muted); line-height:1.5;">
+                    &bull; Penghapusan kategori tidak dapat dilakukan jika masih memiliki <code class="mono">data_requirements</code> aktif.<br />
+                    &bull; Perubahan nama kategori tercatat otomatis oleh layanan audit <code class="mono">change_logs</code>.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Inspector / Form Card -->
+              <aside class="card card-pad" style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <div style="font-size:14.5px; font-weight:600;">Tambah / Ubah Kategori</div>
+                  <div style="font-size:12px; color:var(--text-muted);">Isi form di bawah untuk menyimpan data kategori</div>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Operation Type</label>
+                  <input class="input input-locked mono" value="CREATE" readonly />
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Nama Kategori *</label>
+                  <input class="input" placeholder="Contoh: Kemahasiswaan & Alumni" />
+                  <span class="helper">Wajib diisi, maksimal 250 karakter.</span>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Target Akses Role</label>
+                  <div style="display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-secondary);">
+                    <label style="display:flex; align-items:center; gap:7px;"><input type="radio" name="vis" checked /> Admin &amp; Verifikator</label>
+                    <label style="display:flex; align-items:center; gap:7px;"><input type="radio" name="vis" /> Semua Dosen Pengunggah</label>
+                  </div>
+                </div>
+
+                <div class="banner-info">
+                  Data dikirim ke <code class="mono">POST /documents/categories/</code> sesuai skema validasi backend.
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px; padding-top:4px;">
+                  <button class="btn btn-action">Simpan Kategori</button>
+                  <button class="btn btn-ghost">Reset</button>
+                </div>
+              </aside>
+            </div>
+          </main>
+
+          <footer class="pub-footer" style="padding:12px 26px;">
+            <span>SIMPATI &middot; Penjaminan Mutu Prodi</span>
+            <span>Role aktif: Admin</span>
+          </footer>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. KPI PROGRESS + TABLE (Tiles 9, 15, 16) -->
+    <section id="screen-kpi" class="screen-frame">
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand-lockup" style="padding: 2px 6px;">
+            <div class="brand-icon">S</div>
+            <div>
+              <div class="brand-name">SIMPATI</div>
+              <div class="brand-sub">Penjaminan Mutu</div>
+            </div>
+          </div>
+          <div>
+            <div class="nav-group-label">Utama</div>
+            <a class="nav-item active">Ketercapaian Mutu</a>
+            <a class="nav-item">Antrean Verifikasi</a>
+            <a class="nav-item">Rekap Penilaian</a>
+          </div>
+          <div>
+            <div class="nav-group-label">Direktur</div>
+            <a class="nav-item">Provisi Akun</a>
+            <a class="nav-item">Audit Trail</a>
+          </div>
+        </aside>
+
+        <div class="main-col">
+          <header class="topbar">
+            <div class="breadcrumb">Dashboard / <strong>Ketercapaian Mutu Prodi</strong></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span class="badge badge-neutral">Director</span>
+              <button class="btn btn-outline btn-sm">Keluar</button>
+            </div>
+          </header>
+
+          <main class="content">
+            <div class="page-head">
+              <div>
+                <h1 class="page-title">Ringkasan Ketercapaian Mutu</h1>
+                <p class="page-sub">Pantau progres kelengkapan bukti dokumen per periode dan status verifikasi pengajuan.</p>
+              </div>
+              <button class="btn btn-outline">Ekspor Ringkasan</button>
+            </div>
+
+            <div class="toolbar">
+              <input class="input" placeholder="Cari kebutuhan dokumen atau departemen..." style="flex:1;" />
+              <select class="select" style="width:160px;"><option>Semester Ganjil 2026</option></select>
+              <select class="select" style="width:140px;"><option>Semua Departemen</option></select>
+            </div>
+
+            <!-- Progress + Breakdown Row (Tile 15) -->
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:14px;">
+              <div class="card card-pad">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <span style="font-size:13px; font-weight:600;">Persentase Ketercapaian Dokumen</span>
+                  <span style="font-size:12px; color:var(--text-muted);" class="tabular">12 / 50 kebutuhan</span>
+                </div>
+                <div class="kpi-big tabular" style="margin-top:6px;">24,0%</div>
+                <div class="progress-track"><div class="progress-fill" style="width:24%;"></div></div>
+                <div style="font-size:12px; color:var(--text-muted);">Dihitung dari entri dokumen dengan status verifikasi <strong style="color:var(--text-primary);">Accept</strong>.</div>
+              </div>
+
+              <div class="card card-pad">
+                <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Target Ambang Batas</div>
+                <div style="font-size:12.5px; color:var(--text-muted); line-height:1.55;">
+                  &bull; Pass rate minimum prodi: <strong class="tabular" style="color:var(--text-primary);">75,00%</strong><br />
+                  &bull; Success rate unggul: <strong class="tabular" style="color:var(--text-primary);">90,00%</strong><br />
+                  &bull; Tenggat periode aktif: <strong class="tabular" style="color:var(--text-primary);">30 Des 2026</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6-col Mini KPI Strip -->
+            <div class="kpi-grid-6">
+              <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-val tabular">50</div></div>
+              <div class="kpi-card"><div class="kpi-label">Accept</div><div class="kpi-val tabular">12</div></div>
+              <div class="kpi-card"><div class="kpi-label">Hold</div><div class="kpi-val tabular">18</div></div>
+              <div class="kpi-card"><div class="kpi-label">Revision</div><div class="kpi-val tabular">6</div></div>
+              <div class="kpi-card"><div class="kpi-label">Reject</div><div class="kpi-val tabular">2</div></div>
+              <div class="kpi-card"><div class="kpi-label">Belum Unggah</div><div class="kpi-val tabular">12</div></div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kebutuhan Dokumen</th>
+                    <th>Departemen PIC</th>
+                    <th>Periode</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Laporan Evaluasi Pembelajaran</strong></td>
+                    <td>Teknik Informatika</td>
+                    <td class="tabular">2026 / Smt 1</td>
+                    <td><span class="badge badge-success">Accept</span></td>
+                    <td style="text-align:right;"><button class="btn btn-outline btn-sm">Lihat</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Rekap Penelitian Dosen Tetap</strong></td>
+                    <td>Sistem Informasi</td>
+                    <td class="tabular">2026 / Smt 1</td>
+                    <td><span class="badge badge-warning">Hold</span></td>
+                    <td style="text-align:right;"><button class="btn btn-outline btn-sm">Tinjau</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Berita Acara Rapat Tinjauan</strong></td>
+                    <td>Penjaminan Mutu</td>
+                    <td class="tabular">2026 / Bulanan</td>
+                    <td><span class="badge badge-danger">Reject</span></td>
+                    <td style="text-align:right;"><button class="btn btn-outline btn-sm">Detail</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-bar">
+              <span>Menampilkan 1–3 dari 50 kebutuhan</span>
+              <div class="page-btns">
+                <button class="btn btn-outline btn-sm">Previous</button>
+                <span class="page-num active">1</span>
+                <span class="page-num">2</span>
+                <button class="btn btn-outline btn-sm">Next</button>
+              </div>
+            </div>
+
+            <div class="banner-info">
+              Catatan: Data hanya menampilkan bukti pengajuan dari sesi dan periode yang telah dikonfirmasi oleh sistem.
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. DETAIL & REVIEW WORKSPACE (Tiles 10, 12, 14) -->
+    <section id="screen-review" class="screen-frame">
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="brand-lockup" style="padding: 2px 6px;">
+            <div class="brand-icon">S</div>
+            <div>
+              <div class="brand-name">SIMPATI</div>
+              <div class="brand-sub">Penjaminan Mutu</div>
+            </div>
+          </div>
+          <div>
+            <div class="nav-group-label">Verifikator</div>
+            <a class="nav-item active">Antrean Verifikasi</a>
+            <a class="nav-item">Riwayat Tinjauan</a>
+          </div>
+        </aside>
+
+        <div class="main-col">
+          <header class="topbar">
+            <div class="breadcrumb">Verifikasi / <strong>Detail Pengajuan #SUB-104</strong></div>
+            <button class="btn btn-outline btn-sm">Keluar</button>
+          </header>
+
+          <main class="content">
+            <a href="#" class="back-link">&larr; Kembali ke Antrean Verifikasi</a>
+            <div class="page-head">
+              <div>
+                <h1 class="page-title">Tinjauan Bukti Pengajuan</h1>
+                <p class="page-sub">Periksa kelengkapan berkas bukti dan tentukan keputusan verifikasi.</p>
+              </div>
+              <span class="badge badge-warning">Status: Hold</span>
+            </div>
+
+            <div class="banner-info">
+              Pastikan dokumen sesuai dengan periode pelaporan dan tidak mengandung data rahasia tanpa penandaan <code class="mono">is_secret</code>.
+            </div>
+
+            <div class="split-grid">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div class="card card-pad">
+                  <div style="font-size:14px; font-weight:600; margin-bottom:10px;">Informasi Pengajuan</div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12.5px;">
+                    <div><span style="color:var(--text-muted);">Pengunggah:</span> <strong>Ahmad Fauzi, M.Kom.</strong></div>
+                    <div><span style="color:var(--text-muted);">Periode:</span> <strong class="tabular">Ganjil 2026</strong></div>
+                    <div><span style="color:var(--text-muted);">Kategori:</span> <strong>Kurikulum &amp; RPS</strong></div>
+                    <div><span style="color:var(--text-muted);">Sifat Berkas:</span> <strong>Publik Internal</strong></div>
+                  </div>
+                </div>
+
+                <div class="card card-pad" style="display:flex; flex-direction:column; gap:12px;">
+                  <div style="font-size:14px; font-weight:600;">Lampiran &amp; Pratinjau Berkas</div>
+                  <div class="dropzone">
+                    Seret berkas revisi ke sini atau klik untuk memilih file (<code class="mono">pdf, docx, xlsx</code>)
+                  </div>
+                  <div class="preview-empty">
+                    <div>
+                      <strong style="display:block; color:var(--text-primary); margin-bottom:3px;">Pratinjau Dokumen</strong>
+                      <span>rps-basis-data-2026.pdf (1,42 MB)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr><th>Waktu</th><th>Aktor</th><th>Status</th><th>Catatan</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="tabular">26 Nov 2026</td>
+                        <td>Ahmad Fauzi</td>
+                        <td><span class="badge badge-warning">Hold</span></td>
+                        <td>Pengajuan awal semester ganjil</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <aside class="card card-pad" style="display:flex; flex-direction:column; gap:12px;">
+                <div style="font-size:14.5px; font-weight:600;">Keputusan Verifikasi</div>
+                <div style="display:flex; flex-direction:column; gap:7px; font-size:13px;">
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="radio" name="dec" checked /> Accept (Diterima)</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="radio" name="dec" /> Revision (Perlu Revisi)</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="radio" name="dec" /> Reject (Ditolak)</label>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Catatan Reviewer</label>
+                  <textarea class="textarea" placeholder="Tuliskan alasan keputusan atau bagian yang perlu diperbaiki..."></textarea>
+                </div>
+
+                <div class="banner-info">
+                  Keputusan verifikasi akan mengunci perubahan berkas jika status diset menjadi <strong>Accept</strong>.
+                </div>
+
+                <button class="btn btn-action" style="width:100%;">Simpan Keputusan</button>
+              </aside>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DESIGN TOKENS & COMPONENTS GALLERY -->
+    <section id="screen-tokens" class="screen-frame">
+      <div style="padding:32px; background:#fff;">
+        <h1 style="margin:0 0 6px; font-size:22px;">Tokens &amp; Component Reference</h1>
+        <p style="margin:0 0 24px; color:var(--text-muted); font-size:13.5px;">Ringkasan token warna, tombol, status badge, input, dan banner yang dipakai di seluruh 19 layar.</p>
+
+        <h2 style="font-size:14px; margin:0 0 12px;">Palet Warna Utama</h2>
+        <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; margin-bottom:28px;">
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#F5FAFE; border-bottom:1px solid #E4E7EC;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Canvas</strong><br /><span class="mono">#F5FAFE</span></div></div>
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#EDF6FD; border-bottom:1px solid #E4E7EC;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Tinted</strong><br /><span class="mono">#EDF6FD</span></div></div>
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#ECEEEF; border-bottom:1px solid #E4E7EC;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Subtle/Info</strong><br /><span class="mono">#ECEEEF</span></div></div>
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#005C7C;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Brand Deep</strong><br /><span class="mono">#005C7C</span></div></div>
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#4E9AC7;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Brand Action</strong><br /><span class="mono">#4E9AC7</span></div></div>
+          <div class="card" style="overflow:hidden;"><div style="height:48px; background:#18181B;"></div><div style="padding:8px 10px; font-size:11.5px;"><strong>Ink Primary</strong><br /><span class="mono">#18181B</span></div></div>
+        </div>
+
+        <h2 style="font-size:14px; margin:0 0 12px;">Buttons &amp; Badges</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:24px;">
+          <button class="btn btn-deep">Hero CTA (#005C7C)</button>
+          <button class="btn btn-action">Primary Action (#4E9AC7)</button>
+          <button class="btn btn-outline">Secondary Outline</button>
+          <button class="btn btn-ghost">Ghost / Batal</button>
+          <span class="badge badge-success">Accept / Verified</span>
+          <span class="badge badge-warning">Hold / Revision</span>
+          <span class="badge badge-danger">Reject / Error</span>
+          <span class="badge badge-neutral">Neutral Role</span>
+        </div>
+
+        <h2 style="font-size:14px; margin:0 0 12px;">Banners</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="banner-info"><strong>Info / Rule Banner (#ECEEEF)</strong>Digunakan untuk petunjuk konteks, kebijakan audit, dan catatan form.</div>
+          <div class="banner-danger"><strong>Rose Alert (#FEE8EA)</strong>Digunakan untuk pesan error autentikasi dan validasi form.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function showScreen(id, btn) {
+      document.querySelectorAll('.screen-frame').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.ref-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

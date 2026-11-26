@@ -1,23 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { completeGoogleAuthorization } from '#/api/auth.api'
 import { ApiException } from '#/api/types'
 import { useAuth } from '#/auth/auth-context'
 import { BrandLockup } from '#/components/layout/brand-lockup'
-import { DangerBanner } from '#/components/ui/alert-banner'
-import { Button } from '#/components/ui/button'
 import { Card, CardDescription, CardTitle } from '#/components/ui/card'
-
-type CallbackState =
-  | { kind: 'loading' }
-  | { kind: 'denied'; title: string; description: string }
-  | { kind: 'invalid'; title: string; description: string }
-  | { kind: 'error'; title: string; description: string; status?: number }
 
 export function OAuthCallbackView() {
   const navigate = useNavigate()
   const { loginWithToken } = useAuth()
-  const [state, setState] = useState<CallbackState>({ kind: 'loading' })
   const hasAttemptedRef = useRef(false)
 
   useEffect(() => {
@@ -25,13 +16,47 @@ export function OAuthCallbackView() {
     hasAttemptedRef.current = true
 
     const params = new URLSearchParams(window.location.search)
+    const directToken = params.get('token')
     const providerError = params.get('error')
     const code = params.get('code')
     const oauthState = params.get('state')
 
+    function redirectToContactAdmin(options: {
+      reason: string
+      title: string
+      description: string
+      status?: number
+    }) {
+      void navigate({
+        to: '/contact-admin',
+        replace: true,
+        search: {
+          reason: options.reason,
+          title: options.title,
+          description: options.description,
+          ...(options.status ? { status: String(options.status) } : {}),
+        },
+      })
+    }
+
+    if (directToken) {
+      const stored = loginWithToken(directToken)
+      if (stored) {
+        void navigate({ to: '/dashboard', replace: true })
+      } else {
+        redirectToContactAdmin({
+          reason: 'invalid_token',
+          title: 'Token autentikasi tidak valid',
+          description:
+            'Token sesi yang diterima tidak valid atau telah kedaluwarsa. Hubungi Admin Prodi jika kendala berlanjut.',
+        })
+      }
+      return
+    }
+
     if (providerError) {
-      setState({
-        kind: 'denied',
+      redirectToContactAdmin({
+        reason: 'denied',
         title: 'Otorisasi Google ditolak',
         description: `Permintaan masuk dibatalkan atau ditolak oleh penyedia Google (${providerError}).`,
       })
@@ -39,8 +64,8 @@ export function OAuthCallbackView() {
     }
 
     if (!code || !oauthState) {
-      setState({
-        kind: 'invalid',
+      redirectToContactAdmin({
+        reason: 'invalid_callback',
         title: 'Parameter callback tidak valid',
         description:
           'URL callback tidak menyertakan parameter code dan state yang diperlukan untuk menyelesaikan autentikasi.',
@@ -53,19 +78,19 @@ export function OAuthCallbackView() {
         const res = await completeGoogleAuthorization(code, oauthState)
         const token = res.data?.[0]?.token
         if (!token) {
-          setState({
-            kind: 'error',
+          redirectToContactAdmin({
+            reason: 'missing_token',
             title: 'Token autentikasi tidak ditemukan',
             description:
-              'Backend berhasil memproses callback tetapi tidak mengembalikan token JWT.',
+              'Server berhasil memproses callback tetapi tidak mengembalikan token JWT.',
           })
           return
         }
 
         const stored = loginWithToken(token)
         if (!stored) {
-          setState({
-            kind: 'error',
+          redirectToContactAdmin({
+            reason: 'invalid_token',
             title: 'Token JWT tidak valid',
             description:
               'Payload token yang diterima tidak memuat identitas akun yang lengkap.',
@@ -76,15 +101,15 @@ export function OAuthCallbackView() {
         await navigate({ to: '/dashboard', replace: true })
       } catch (err) {
         if (err instanceof ApiException) {
-          setState({
-            kind: 'error',
+          redirectToContactAdmin({
+            reason: 'auth_failed',
             status: err.status,
             title: err.title,
             description: err.description,
           })
         } else {
-          setState({
-            kind: 'error',
+          redirectToContactAdmin({
+            reason: 'auth_failed',
             title: 'Gagal menyelesaikan autentikasi',
             description:
               'Terjadi kesalahan saat memverifikasi callback Google ke backend.',
@@ -103,42 +128,19 @@ export function OAuthCallbackView() {
 
       <main className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-[440px]" padding="lg">
-          {state.kind === 'loading' ? (
-            <div className="flex flex-col items-center py-4 text-center">
-              <span
-                aria-hidden="true"
-                className="h-7 w-7 animate-spin rounded-full border-[3px] border-brand-action border-t-transparent"
-              />
-              <CardTitle className="mt-4 text-[17px]">
-                Memverifikasi akun Google...
-              </CardTitle>
-              <CardDescription className="mt-1.5">
-                Mohon tunggu sebentar sementara sistem menukar kode otorisasi
-                dengan sesi aktif.
-              </CardDescription>
-            </div>
-          ) : (
-            <div>
-              <span className="inline-flex items-center rounded-full bg-danger-soft px-2.5 py-0.5 text-[11.5px] font-semibold text-danger-text">
-                {state.kind === 'denied'
-                  ? 'Akses Ditolak'
-                  : state.kind === 'invalid'
-                    ? 'Callback Tidak Valid'
-                    : `Error ${state.status ?? ''}`.trim()}
-              </span>
-              <CardTitle className="mt-3 text-[18px]">{state.title}</CardTitle>
-              <DangerBanner className="mt-3">{state.description}</DangerBanner>
-
-              <div className="mt-5 flex flex-wrap items-center gap-2.5">
-                <Link to="/login">
-                  <Button variant="action">Kembali ke Halaman Masuk</Button>
-                </Link>
-                <Link to="/">
-                  <Button variant="outline">Ke Beranda</Button>
-                </Link>
-              </div>
-            </div>
-          )}
+          <div className="flex flex-col items-center py-4 text-center">
+            <span
+              aria-hidden="true"
+              className="h-7 w-7 animate-spin rounded-full border-[3px] border-brand-action border-t-transparent"
+            />
+            <CardTitle className="mt-4 text-[17px]">
+              Memverifikasi akun Google...
+            </CardTitle>
+            <CardDescription className="mt-1.5">
+              Mohon tunggu sebentar sementara sistem mengarahkan Anda ke
+              dashboard.
+            </CardDescription>
+          </div>
         </Card>
       </main>
     </div>

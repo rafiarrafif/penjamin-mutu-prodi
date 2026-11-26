@@ -2,9 +2,17 @@ import { getToken } from '#/auth/auth-storage'
 import { ApiException   } from './types'
 import type {ErrorResponse, SuccessResponse} from './types';
 
-const BASE_URL = (
-  import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const CONFIGURED_ENDPOINT = (
+  import.meta.env.BACKEND_ENDPOINT || 'https://server0.simutu.my.id'
 ).replace(/\/+$/, '')
+
+const isLocalOrigin =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1')
+
+const BASE_URL =
+  import.meta.env.DEV || isLocalOrigin ? '/api' : CONFIGURED_ENDPOINT
 
 export const AUTH_UNAUTHORIZED_EVENT = 'simpati:auth-unauthorized'
 
@@ -50,8 +58,7 @@ export async function apiRequest<T = unknown>(
     throw new ApiException({
       status: 0,
       title: 'Koneksi ke server gagal',
-      description:
-        'Tidak dapat menghubungi backend. Pastikan server API aktif dan CORS mengizinkan origin frontend.',
+      description: 'Tidak dapat menghubungi server backend.',
       errors: [],
     })
   }

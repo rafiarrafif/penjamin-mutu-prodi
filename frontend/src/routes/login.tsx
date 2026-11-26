@@ -1,52 +1,77 @@
-import { useState } from 'react'
-import { Link, Navigate, createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { Link, Navigate, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { requestGoogleAuthorization } from '#/api/auth.api'
 import { ApiException } from '#/api/types'
 import { useAuth } from '#/auth/auth-context'
 import { BrandLockup } from '#/components/layout/brand-lockup'
-import { DangerBanner, InfoBanner } from '#/components/ui/alert-banner'
+import { InfoBanner } from '#/components/ui/alert-banner'
 import { Button } from '#/components/ui/button'
 
 export const Route = createFileRoute('/login')({ component: LoginPage })
 
 function LoginPage() {
+  const navigate = useNavigate()
   const { isAuthenticated, isLoading } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errorState, setErrorState] = useState<{
-    title: string
-    description: string
-  } | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const providerError = params.get('error')
+    if (providerError) {
+      void navigate({
+        to: '/contact-admin',
+        replace: true,
+        search: {
+          reason: 'denied',
+          title: 'Login Google gagal atau dibatalkan',
+          description: `Penyedia autentikasi mengembalikan status error (${providerError}).`,
+        },
+      })
+    }
+  }, [navigate])
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/dashboard" replace />
   }
 
   async function handleGoogleSignIn() {
-    setErrorState(null)
     setIsSubmitting(true)
     try {
       const response = await requestGoogleAuthorization()
       const authorizationUrl = response.data?.[0]?.authorizationUrl
       if (!authorizationUrl) {
-        setErrorState({
-          title: 'URL otorisasi tidak tersedia',
-          description:
-            'Server tidak mengembalikan tautan otorisasi Google OAuth.',
+        await navigate({
+          to: '/contact-admin',
+          search: {
+            reason: 'missing_auth_url',
+            title: 'URL otorisasi tidak tersedia',
+            description:
+              'Server tidak mengembalikan tautan otorisasi Google OAuth.',
+          },
         })
         return
       }
       window.location.assign(authorizationUrl)
     } catch (err) {
       if (err instanceof ApiException) {
-        setErrorState({
-          title: err.title,
-          description: err.description,
+        await navigate({
+          to: '/contact-admin',
+          search: {
+            reason: 'auth_request_failed',
+            status: String(err.status),
+            title: err.title,
+            description: err.description,
+          },
         })
       } else {
-        setErrorState({
-          title: 'Gagal memulai login Google',
-          description:
-            'Terjadi kesalahan tak terduga saat menghubungi layanan autentikasi.',
+        await navigate({
+          to: '/contact-admin',
+          search: {
+            reason: 'auth_request_failed',
+            title: 'Gagal memulai login Google',
+            description:
+              'Terjadi kesalahan tak terduga saat menghubungi layanan autentikasi.',
+          },
         })
       }
     } finally {
@@ -96,12 +121,6 @@ function LoginPage() {
               </p>
             </div>
 
-            {errorState && (
-              <DangerBanner title={errorState.title}>
-                {errorState.description}
-              </DangerBanner>
-            )}
-
             <InfoBanner title="Syarat Akses Akun">
               Pastikan email Google Anda sudah diprovisi oleh Admin dan telah
               terverifikasi sebelum melanjutkan proses masuk.
@@ -138,8 +157,14 @@ function LoginPage() {
             </div>
 
             <p className="m-0 text-center text-[11.5px] leading-relaxed text-ink-muted">
-              Belum memiliki akses? Hubungi Admin Program Studi untuk
-              pendaftaran akun.
+              Belum memiliki akses atau gagal masuk?{' '}
+              <Link
+                to="/contact-admin"
+                className="font-semibold text-brand-deep no-underline hover:underline"
+              >
+                Hubungi Admin Prodi
+              </Link>
+              .
             </p>
           </div>
         </div>

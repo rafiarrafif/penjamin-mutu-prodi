@@ -3,7 +3,10 @@ import "dotenv/config";
 import { jwt } from "@elysia/jwt";
 import { prisma } from "../../utils/prisma";
 import { unauthenticatedOnlyMiddleware } from "./middlewares/unauthenticatedOnly.middleware";
-import { requireRoleMiddleware } from "../../middlewares/requireRole.middleware";
+import {
+  requireRoleMiddleware,
+  requireRoles,
+} from "../../middlewares/requireRole.middleware";
 import { FindActiveSessionRepository } from "../sessions/repositories/findActiveSession.repository";
 import { FindActiveSessionService } from "../sessions/services/findActiveSession.service";
 import { CreateSessionRepository } from "../sessions/repositories/createSession.repository";
@@ -86,17 +89,17 @@ export const accountsRouter = new Elysia({ name: "accounts" })
     (context) => googleCallbackController.handle(context),
     { detail: googleAuthorizationCallbackDocumentation },
   )
-  .derive(requireRoleMiddleware("admin", activeSessionService))
+  .derive(requireRoles(["admin", "director"], activeSessionService))
   .post("/accounts/", (context) => createController.handle(context), {
     detail: createAccountDocumentation,
   })
-  .derive(requireRoleMiddleware("director", activeSessionService))
+  .derive(requireRoles(["admin", "director"], activeSessionService))
   .post(
     "/accounts/approvalprovision",
     (context) => approvalController.handle(context),
     { detail: approvalProvisionDocumentation },
   )
-  .derive(requireRoleMiddleware("admin", activeSessionService))
+  .derive(requireRoles(["admin", "director"], activeSessionService))
   .post(
     "/accounts/editfromadmin",
     (context) => editController.handle(context),

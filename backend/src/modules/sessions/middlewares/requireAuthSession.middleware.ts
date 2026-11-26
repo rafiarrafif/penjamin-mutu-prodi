@@ -35,10 +35,7 @@ export async function requireAuthSessionMiddleware({
   }
 
   const claims = await jwt.verify(match[1]);
-  if (
-    !claims ||
-    typeof claims.session_id !== "string"
-  ) {
+  if (!claims || typeof claims.session_id !== "string") {
     return status(
       401,
       errorResponse(

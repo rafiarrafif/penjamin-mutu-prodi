@@ -1,0 +1,83 @@
+/**
+ * Design System Tokens — Penjaminan Mutu Prodi (SIMPATI)
+ * Patokan warna, tipografi, radius, elevasi, dan utilitas komponen
+ * sesuai DESIGN.md dan design-reference.html.
+ */
+
+@theme {
+  --font-sans: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-canvas: #F5FAFE;
+  --color-surface: #FFFFFF;
+  --color-surface-tinted: #EDF6FD;
+  --color-surface-subtle: #ECEEEF;
+  --color-table-head: #EAECEF;
+  --color-nav-active: #E8E9EC;
+
+  --color-border-default: #E4E7EC;
+  --color-border-strong: #D0D5DD;
+  --color-border-tinted: #D7EAF8;
+
+  --color-ink-primary: #18181B;
+  --color-ink-secondary: #3F3F46;
+  --color-ink-muted: #667085;
+  --color-ink-subtle: #98A2B3;
+
+  --color-brand-deep: #005C7C;
+  --color-brand-deep-hover: #004B65;
+  --color-brand-action: #4E9AC7;
+  --color-brand-action-hover: #3D88B5;
+
+  --color-danger-soft: #FEE8EA;
+  --color-danger-border: #F5C2C7;
+  --color-danger-text: #B42318;
+
+  --color-success-soft: #ECFDF3;
+  --color-success-text: #067647;
+
+  --color-warning-soft: #FFFAEB;
+  --color-warning-text: #B54708;
+}
+
+:root {
+  --bg-canvas: #F5FAFE;
+  --bg-surface: #FFFFFF;
+  --bg-surface-tinted: #EDF6FD;
+  --bg-subtle: #ECEEEF;
+  --bg-table-head: #EAECEF;
+  --bg-nav-active: #E8E9EC;
+
+  --border-default: #E4E7EC;
+  --border-strong: #D0D5DD;
+  --border-tinted: #D7EAF8;
+
+  --text-primary: #18181B;
+  --text-secondary: #3F3F46;
+  --text-muted: #667085;
+  --text-subtle: #98A2B3;
+
+  --brand-deep: #005C7C;
+  --brand-deep-hover: #004B65;
+  --brand-action: #4E9AC7;
+  --brand-action-hover: #3D88B5;
+
+  --bg-danger-soft: #FEE8EA;
+  --border-danger-soft: #F5C2C7;
+  --text-danger: #B42318;
+
+  --bg-success-soft: #ECFDF3;
+  --text-success: #067647;
+
+  --bg-warning-soft: #FFFAEB;
+  --text-warning: #B54708;
+
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --shadow-auth: 0 8px 24px -8px rgba(15, 23, 42, 0.08);
+  --shadow-overlay: 0 12px 32px -8px rgba(15, 23, 42, 0.12);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

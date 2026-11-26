@@ -10,33 +10,155 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
+import { Route as AdminDepartmentsRouteImport } from './routes/admin/departments'
+import { Route as DirectorProvisionsRouteImport } from './routes/director/provisions'
+import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
+import { Route as AccountsAuthCallbackGoogleRouteImport } from './routes/accounts/auth/callback/google'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAccountsRoute = AdminAccountsRouteImport.update({
+  id: '/admin/accounts',
+  path: '/admin/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/admin/categories',
+  path: '/admin/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDepartmentsRoute = AdminDepartmentsRouteImport.update({
+  id: '/admin/departments',
+  path: '/admin/departments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectorProvisionsRoute = DirectorProvisionsRouteImport.update({
+  id: '/director/provisions',
+  path: '/director/provisions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsAuthCallbackGoogleRoute =
+  AccountsAuthCallbackGoogleRouteImport.update({
+    id: '/accounts/auth/callback/google',
+    path: '/accounts/auth/callback/google',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/departments': typeof AdminDepartmentsRoute
+  '/director/provisions': typeof DirectorProvisionsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/accounts/auth/callback/google': typeof AccountsAuthCallbackGoogleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/departments': typeof AdminDepartmentsRoute
+  '/director/provisions': typeof DirectorProvisionsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/accounts/auth/callback/google': typeof AccountsAuthCallbackGoogleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/departments': typeof AdminDepartmentsRoute
+  '/director/provisions': typeof DirectorProvisionsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/accounts/auth/callback/google': typeof AccountsAuthCallbackGoogleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/profile'
+    | '/admin/accounts'
+    | '/admin/categories'
+    | '/admin/departments'
+    | '/director/provisions'
+    | '/oauth/callback'
+    | '/accounts/auth/callback/google'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/profile'
+    | '/admin/accounts'
+    | '/admin/categories'
+    | '/admin/departments'
+    | '/director/provisions'
+    | '/oauth/callback'
+    | '/accounts/auth/callback/google'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/profile'
+    | '/admin/accounts'
+    | '/admin/categories'
+    | '/admin/departments'
+    | '/director/provisions'
+    | '/oauth/callback'
+    | '/accounts/auth/callback/google'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
+  AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminDepartmentsRoute: typeof AdminDepartmentsRoute
+  DirectorProvisionsRoute: typeof DirectorProvisionsRoute
+  OauthCallbackRoute: typeof OauthCallbackRoute
+  AccountsAuthCallbackGoogleRoute: typeof AccountsAuthCallbackGoogleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +170,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/accounts': {
+      id: '/admin/accounts'
+      path: '/admin/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AdminAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/admin/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/departments': {
+      id: '/admin/departments'
+      path: '/admin/departments'
+      fullPath: '/admin/departments'
+      preLoaderRoute: typeof AdminDepartmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/director/provisions': {
+      id: '/director/provisions'
+      path: '/director/provisions'
+      fullPath: '/director/provisions'
+      preLoaderRoute: typeof DirectorProvisionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/auth/callback/google': {
+      id: '/accounts/auth/callback/google'
+      path: '/accounts/auth/callback/google'
+      fullPath: '/accounts/auth/callback/google'
+      preLoaderRoute: typeof AccountsAuthCallbackGoogleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
+  AdminAccountsRoute: AdminAccountsRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminDepartmentsRoute: AdminDepartmentsRoute,
+  DirectorProvisionsRoute: DirectorProvisionsRoute,
+  OauthCallbackRoute: OauthCallbackRoute,
+  AccountsAuthCallbackGoogleRoute: AccountsAuthCallbackGoogleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

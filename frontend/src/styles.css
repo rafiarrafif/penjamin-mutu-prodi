@@ -1,5 +1,6 @@
 
 @import "tailwindcss";
+@import "./styles/design-tokens.css";
 
 * {
   box-sizing: border-box;
@@ -13,5 +14,10 @@ body,
 
 body {
   margin: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 

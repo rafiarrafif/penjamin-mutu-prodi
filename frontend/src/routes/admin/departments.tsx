@@ -158,13 +158,6 @@ function AdminDepartmentsPage() {
             className="mt-4 flex flex-col gap-3.5"
           >
             <FormField
-              label="Operation Type"
-              value="CREATE"
-              locked
-              className="font-mono"
-            />
-
-            <FormField
               label="Nama Departemen"
               value={name}
               onChange={(e) => setName(e.target.value)}

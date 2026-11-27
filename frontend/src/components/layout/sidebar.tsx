@@ -143,7 +143,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
       <div className="mt-auto border-t border-border-default pt-3 px-1 text-[11.5px] text-ink-muted">
         <div>Peran aktif: {formatRoleLabel(role)}</div>
-        <div className="mt-0.5 text-ink-subtle">SIMPATI v1.0</div>
+        <div className="mt-0.5 text-ink-subtle">SIMUTU v1.0</div>
       </div>
     </div>
   )

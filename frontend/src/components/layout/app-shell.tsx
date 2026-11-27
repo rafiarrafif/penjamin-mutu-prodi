@@ -33,7 +33,7 @@ export function AppShell({ breadcrumb, children }: AppShellProps) {
 
         <footer className="border-t border-border-default bg-surface px-4 py-3 text-[12px] text-ink-muted lg:px-7">
           <div className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-2">
-            <span>SIMPATI &middot; Sistem Penjaminan Mutu Program Studi</span>
+            <span>SIMUTU &middot; Sistem Penjaminan Mutu Program Studi</span>
             <span>Peran aktif: {formatRoleLabel(role)}</span>
           </div>
         </footer>

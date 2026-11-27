@@ -513,13 +513,6 @@ function AdminCategoriesPage() {
               }}
               className="mt-3.5 flex flex-col gap-3"
             >
-              <FormField
-                label="Operation Type"
-                value={editingCategory ? 'UPDATE' : 'CREATE'}
-                locked
-                className="font-mono"
-              />
-
               {editingCategory && (
                 <FormField
                   label="Category ID"

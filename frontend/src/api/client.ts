@@ -14,7 +14,7 @@ const isLocalOrigin =
 const BASE_URL =
   import.meta.env.DEV || isLocalOrigin ? '/api' : CONFIGURED_ENDPOINT
 
-export const AUTH_UNAUTHORIZED_EVENT = 'simpati:auth-unauthorized'
+export const AUTH_UNAUTHORIZED_EVENT = 'simutu:auth-unauthorized'
 
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'

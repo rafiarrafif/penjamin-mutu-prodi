@@ -20,7 +20,7 @@ export function BrandLockup({
       </div>
       <div className="leading-tight">
         <div className="text-[14px] font-bold tracking-[-0.02em] text-ink-primary">
-          SIMPATI
+          SIMUTU
         </div>
         <div className="text-[10.5px] text-ink-muted">{subtitle}</div>
       </div>

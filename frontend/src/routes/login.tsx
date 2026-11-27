@@ -172,7 +172,7 @@ function LoginPage() {
 
       <footer className="border-t border-border-default bg-surface py-3.5 text-[12px] text-ink-muted">
         <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-6 lg:px-10">
-          <span>SIMPATI &middot; Autentikasi Google OAuth</span>
+          <span>SIMUTU &middot; Autentikasi Google OAuth</span>
           <span>&copy; 2026 Penjaminan Mutu Prodi</span>
         </div>
       </footer>

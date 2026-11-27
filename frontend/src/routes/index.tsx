@@ -201,7 +201,7 @@ function LandingPage() {
 
       <footer className="border-t border-border-default bg-surface py-4 text-[12px] text-ink-muted">
         <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-2 px-6 lg:px-10">
-          <span>&copy; 2026 SIMPATI — Sistem Penjaminan Mutu Program Studi</span>
+          <span>&copy; 2026 SIMUTU — Sistem Penjaminan Mutu Program Studi</span>
           <span>v1.0 &middot; Academic Quality Assurance</span>
         </div>
       </footer>

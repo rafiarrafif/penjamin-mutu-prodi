@@ -51,9 +51,9 @@ function ContactAdminPage() {
 
   function buildMessageBody(): string {
     return [
-      'Halo Admin Penjaminan Mutu Prodi (SIMPATI),',
+      'Halo Admin Penjaminan Mutu Prodi (SIMUTU),',
       '',
-      'Saya mengalami kendala saat masuk ke portal SIMPATI dan membutuhkan bantuan pendaftaran/verifikasi akun.',
+      'Saya mengalami kendala saat masuk ke portal SIMUTU dan membutuhkan bantuan pendaftaran/verifikasi akun.',
       '',
       `Nama Lengkap: ${senderName.trim() || '-'}`,
       `Email Google: ${senderEmail.trim() || '-'}`,
@@ -87,7 +87,7 @@ function ContactAdminPage() {
   function handleMailtoSubmit(event: FormEvent) {
     event.preventDefault()
     const subject = encodeURIComponent(
-      '[SIMPATI] Permintaan Pendaftaran / Bantuan Login Akun',
+      '[SIMUTU] Permintaan Pendaftaran / Bantuan Login Akun',
     )
     const body = encodeURIComponent(buildMessageBody())
     window.location.href = `mailto:${ADMIN_EMAIL}?subject=${subject}&body=${body}`
@@ -137,7 +137,7 @@ function ContactAdminPage() {
             </h1>
             <p className="mt-0.5 text-[13px] text-ink-muted">
               Halaman khusus bantuan akses bagi pengguna yang gagal melakukan
-              autentikasi ke portal SIMPATI.
+              autentikasi ke portal SIMUTU.
             </p>
           </div>
 
@@ -272,7 +272,7 @@ function ContactAdminPage() {
 
       <footer className="border-t border-border-default bg-surface py-3.5 text-[12px] text-ink-muted">
         <div className="mx-auto flex max-w-[1040px] flex-wrap items-center justify-between gap-2 px-6 lg:px-10">
-          <span>SIMPATI &middot; Pusat Bantuan Akses</span>
+          <span>SIMUTU &middot; Pusat Bantuan Akses</span>
           <span>&copy; 2026 Penjaminan Mutu Prodi</span>
         </div>
       </footer>

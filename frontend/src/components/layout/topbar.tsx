@@ -52,7 +52,7 @@ export function Topbar({ breadcrumb, onOpenMobileNav }: TopbarProps) {
           </svg>
         </button>
         <div className="truncate text-[12.5px] text-ink-muted">
-          SIMPATI / <strong className="font-semibold text-ink-primary">{breadcrumb}</strong>
+          SIMUTU / <strong className="font-semibold text-ink-primary">{breadcrumb}</strong>
         </div>
       </div>
 

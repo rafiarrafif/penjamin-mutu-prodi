@@ -1,6 +1,6 @@
 # Design System & Screen Blueprint (`penjamin-mutu-prodi`)
 
-Dokumen ini adalah **patokan desain resmi** (*single source of truth*) untuk seluruh antarmuka frontend aplikasi **Penjaminan Mutu Prodi (SIMPATI)** agar tampil konsisten, bersih, dan sangat mirip dengan mockup referensi (19 layar).
+Dokumen ini adalah **patokan desain resmi** (*single source of truth*) untuk seluruh antarmuka frontend aplikasi **Penjaminan Mutu Prodi (SIMUTU)** agar tampil konsisten, bersih, dan sangat mirip dengan mockup referensi (19 layar).
 
 > Gunakan dokumen ini bersama [`FRONTEND_IMPLEMENTATION_PLAN.md`](./FRONTEND_IMPLEMENTATION_PLAN.md) (kontrak API, role, dan validasi) serta [`design-reference.html`](./design-reference.html) (preview visual interaktif yang bisa dibuka langsung di browser).
 
@@ -91,7 +91,7 @@ Semua token berikut sudah disiapkan di [`frontend/src/styles/design-tokens.css`]
 
 ### Shell A — Public Landing Page (Referensi: Tile 19)
 1. **Topbar Publik** (`56px`, latar `#FFFFFF`, border bawah `#E4E7EC`):
-   - Kiri: Logo crest + wordmark aplikasi (`SIMPATI` + sub-caption `Penjaminan Mutu Prodi`).
+   - Kiri: Logo crest + wordmark aplikasi (`SIMUTU` + sub-caption `Penjaminan Mutu Prodi`).
    - Kanan: 3–4 link teks ringan (`Beranda`, `Panduan`, `Masuk` sebagai link/tombol ringan).
 2. **Hero Section** (latar `#F5FAFE`, padding vertikal `64px–80px`, grid 2 kolom `1.1fr 0.9fr`):
    - Kiri: Eyebrow uppercase (`SISTEM PENJAMINAN MUTU PRODI`), Display Headline 2 baris (`Mutu terjaga.` / `Bukti tertata.`), subjudul ringkas 2 baris (`#667085`), tombol utama `#005C7C` (`Masuk ke Sistem` / `Mulai Sekarang`), dan link sekunder kecil di bawah tombol.
@@ -99,7 +99,7 @@ Semua token berikut sudah disiapkan di [`frontend/src/styles/design-tokens.css`]
 3. **Feature Grid Section** (latar `#FFFFFF`, border atas `#E4E7EC`):
    - Header baris: Judul section kiri (`Fitur Utama`) + link kecil kanan.
    - Grid 3 kolom sama lebar (`gap-4`): Kartu latar `#EDF6FD` / `#F4F9FD`, border `#DCEBF7`, radius `8px`, padding `20px`, ikon kotak kecil kiri atas, judul bold `14px`, deskripsi 2 baris `#667085`.
-4. **Minimal Footer**: Copyright kiri (`© 2026 SIMPATI — Penjaminan Mutu Prodi`), teks versi/institusi kanan.
+4. **Minimal Footer**: Copyright kiri (`© 2026 SIMUTU — Penjaminan Mutu Prodi`), teks versi/institusi kanan.
 
 ### Shell B — Authentication / Login Page (Referensi: Tile 1)
 1. **Topbar Minimal**: Logo di kiri, latar `#FFFFFF`, border bawah `#E4E7EC`.

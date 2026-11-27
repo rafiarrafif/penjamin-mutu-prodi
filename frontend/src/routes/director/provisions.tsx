@@ -160,13 +160,6 @@ function DirectorProvisionsPage() {
               className="mt-4 flex flex-col gap-3.5"
             >
               <FormField
-                label="Operation Type"
-                value="UPDATE"
-                locked
-                className="font-mono"
-              />
-
-              <FormField
                 label="Email Akun"
                 type="email"
                 value={email}

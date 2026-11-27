@@ -40,9 +40,7 @@ export function requireAuthSessionMiddleware(
 
     const verified = await jwt.verify(match[1]).catch(() => false);
     const claims =
-      typeof verified === "object" && verified !== null
-        ? verified
-        : false;
+      typeof verified === "object" && verified !== null ? verified : false;
 
     if (
       !claims ||
@@ -114,7 +112,8 @@ export function requireAuthSessionMiddleware(
           {
             status: 401,
             title: "Invalid account",
-            description: "The authenticated account does not have a recognized role.",
+            description:
+              "The authenticated account does not have a recognized role.",
             errors: [
               {
                 field: "role",

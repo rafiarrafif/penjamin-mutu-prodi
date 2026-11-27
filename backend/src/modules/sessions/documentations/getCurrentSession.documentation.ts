@@ -14,7 +14,10 @@ const successEnvelope: OpenAPIV3.SchemaObject = {
         description: { type: "string" },
       },
     },
-    data: { type: "array", items: { type: "object", additionalProperties: true } },
+    data: {
+      type: "array",
+      items: { type: "object", additionalProperties: true },
+    },
   },
 };
 
